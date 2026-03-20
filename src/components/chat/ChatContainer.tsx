@@ -21,7 +21,7 @@ export default function ChatContainer() {
       id: `${Date.now()}-bot`,
       role: 'bot',
       content: `"${text}"에 대한 결과를 가져오는 중입니다...`,
-      ui_type: 'SKILL',
+      ui_type: 'ARK_GRID',
     };
     setMessages((prev) => [...prev, userMsg, botMsg]);
   };

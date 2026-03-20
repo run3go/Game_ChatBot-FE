@@ -24,6 +24,22 @@
     }
     scrollbar-width: none;
   }
+
+  .bg-ancient-item {
+    background: linear-gradient(180deg, #b89c65 0%, #3c3526 100%);
+  }
+
+  .bg-relic-item {
+    background: linear-gradient(180deg, #843606 0%, #3c3526 100%);
+  }
+
+  .bg-legend-item {
+    background: linear-gradient(90deg, #945a04 0%, #2e1c01 100%);
+  }
+
+  .bg-heroic-item {
+    background: linear-gradient(180deg, #430d57 0%, #22062c 100%);
+  }
 }
 
 html {
