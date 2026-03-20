@@ -16,6 +16,16 @@
 
   --color-surface-dark: #3d3d3d;
 }
+
+@layer utilities {
+  .scrollbar-hide {
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    scrollbar-width: none;
+  }
+}
+
 html {
   font-size: 16px;
   font-family: 'Inter';

@@ -1,3 +1,5 @@
+'use client';
+
 import {
   IconMessageChatbotFilled,
   IconNews,
@@ -35,7 +37,11 @@ const SUGGESTIONS = [
   '요즘 처단자는 어떤 코어를 많이 써?',
 ];
 
-export default function Home() {
+interface HomeProps {
+  onSend?: (message: string) => void;
+}
+
+export default function Home({ onSend }: HomeProps) {
   return (
     <div className="flex h-full w-full flex-col items-center justify-center px-8 py-12">
       <div className="flex flex-col items-center">
@@ -68,7 +74,7 @@ export default function Home() {
         </p>
         <div className="grid grid-cols-2 gap-2">
           {SUGGESTIONS.map((label) => (
-            <SuggestionButton key={label} label={label} />
+            <SuggestionButton key={label} label={label} onClick={() => onSend?.(label)} />
           ))}
         </div>
       </div>

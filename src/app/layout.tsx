@@ -1,4 +1,3 @@
-import ChatInput from '@/components/chat/ChatInput';
 import Header from '@/components/common/Header';
 import Sidebar from '@/components/common/Sidebar';
 import '../assets/styles/globals.css';
@@ -14,9 +13,8 @@ export default function RootLayout({
         <Header />
         <div className="flex flex-1 overflow-hidden">
           <Sidebar />
-          <div className="flex flex-1 flex-col overflow-y-auto">
-            <div className="flex-1 bg-gray-50">{children}</div>
-            <ChatInput />
+          <div className="flex w-full justify-center bg-gray-50">
+            {children}
           </div>
         </div>
       </body>

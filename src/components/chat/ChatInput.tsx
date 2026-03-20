@@ -25,8 +25,8 @@ export default function ChatInput({ onSend }: ChatInputProps) {
   };
 
   return (
-    <div className="border-t border-gray-200 bg-white px-6 py-4">
-      <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+    <div className="w-full">
+      <div className="flex items-center gap-3 rounded-xl border border-gray-300 bg-white px-4 py-3">
         <input
           type="text"
           value={value}
