@@ -32,17 +32,18 @@ export default function PassiveItem({
         <span className={`${style.text}`}>{filteredPoint.description}</span>
         <span className="ml-auto text-gray-500">{filteredPoint.value}</span>
       </div>
-      <ul className="flex flex-col gap-3 text-xs">
+      <ul className="flex flex-col gap-3 text-sm">
         {filteredEffects.map((item) => (
-          <div key={item.effect_name} className="flex">
+          <div key={item.effect_name} className="flex items-center gap-2">
             <Image
               alt={item.effect_name}
               src={item.icon}
               width={20}
               height={20}
+              className="shrink-0"
             />
-            <span className="pr-2 pl-2">{item.tier}</span>
-            <span className={`${style.text} pr-2 pl-3 font-bold`}>
+            <span className="w-10 shrink-0 whitespace-nowrap">{item.tier}</span>
+            <span className={`${style.text} font-bold`}>
               {item.effect_name} Lv.{item.level}
             </span>
           </div>
