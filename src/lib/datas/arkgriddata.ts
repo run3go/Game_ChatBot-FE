@@ -1,4 +1,6 @@
-export const DUMMY_ARK_GRID = {
+import { ArkGridResult } from '@/types/ark_grid';
+
+export const DUMMY_ARK_GRID: { result: ArkGridResult } = {
   result: {
     ui_type: 'ARK_GRID',
     data: {

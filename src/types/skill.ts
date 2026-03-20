@@ -1,14 +1,8 @@
-// 공통 응답 구조
-export interface SkillResponse {
-  result: {
-    ui_type: 'SKILL';
-    data: {
-      armory_skills_tb: ArmorySkill[];
-    };
-  };
+export interface ArmoryGemEffect {
+  character_name: string;
+  description: string;
 }
 
-// 개별 스킬 정보
 export interface ArmorySkill {
   character_name: string;
   skill_name: string;
@@ -46,4 +40,15 @@ export interface ArmoryGem {
   effect_type: string;
   effect_option: string;
   icon: string;
+}
+
+export interface SkillData {
+  armory_skills_tb: ArmorySkill[];
+  armory_gem_effects_tb: ArmoryGemEffect[];
+  armory_gem_tb: ArmoryGem[];
+}
+
+export interface SkillResult {
+  ui_type: 'SKILL';
+  data: SkillData;
 }

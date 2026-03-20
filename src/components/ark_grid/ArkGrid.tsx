@@ -1,7 +1,6 @@
 'use client';
 
-import { DUMMY_ARK_GRID } from '@/lib/datas/arkgriddata';
-import { ArkGridCoreItem } from '@/types/ark_grid';
+import { ArkGridCoreItem, ArkGridData } from '@/types/ark_grid';
 import NodeRow from './NodeRow';
 
 const STAT_GROWTH_PER_LEVEL = {
@@ -13,10 +12,8 @@ const STAT_GROWTH_PER_LEVEL = {
   '아군 피해 강화': 0.0523,
 };
 
-export default function ArkGrid() {
-  const rawData = DUMMY_ARK_GRID.result.data;
-
-  const effects = (rawData.ark_grid_effects_tb || []).map((effect) => {
+export default function ArkGrid({ data }: { data: ArkGridData }) {
+  const effects = (data.ark_grid_effects_tb || []).map((effect) => {
     const name = effect.name as keyof typeof STAT_GROWTH_PER_LEVEL;
     const growthRate = STAT_GROWTH_PER_LEVEL[name] ?? 0;
 
@@ -27,7 +24,7 @@ export default function ArkGrid() {
     };
   });
 
-  const gems = rawData.ark_grid_gems_tb || [];
+  const gems = data.ark_grid_gems_tb || [];
 
   return (
     <div className="flex flex-col gap-4 py-4">
@@ -51,12 +48,11 @@ export default function ArkGrid() {
 
       {/* 코어 노드 목록 */}
       <div className="flex flex-col gap-2">
-        {(rawData.ark_grid_cores_tb || []).map((core, i) => (
+        {(data.ark_grid_cores_tb || []).map((core) => (
           <NodeRow
             key={core.slot_index}
             core={core as ArkGridCoreItem}
             gems={gems.filter((g) => g.core_index === core.slot_index)}
-            defaultOpen={i === 0}
           />
         ))}
       </div>

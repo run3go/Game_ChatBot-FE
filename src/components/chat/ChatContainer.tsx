@@ -1,11 +1,16 @@
 'use client';
 
 import Home from '@/components/home/Home';
+import { DUMMY_ARK_GRID } from '@/lib/datas/arkgriddata';
+import { ArkGridResult } from '@/types/ark_grid';
 import { ChatMessage } from '@/types/chat';
 import { IconMessageChatbotFilled } from '@tabler/icons-react';
 import { useEffect, useRef, useState } from 'react';
 import ChatInput from './ChatInput';
 import UIContainer from './UIContainer';
+
+// const response: { result: SkillResult } = DUMMY_SKILLS;
+const response: { result: ArkGridResult } = DUMMY_ARK_GRID;
 
 export default function ChatContainer() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -56,7 +61,7 @@ export default function ChatContainer() {
                     <div className="px-4 text-sm text-gray-700">
                       {msg.content}
                     </div>
-                    <UIContainer ui_type={msg.ui_type} />
+                    <UIContainer result={response.result} />
                   </div>
                 </div>
               ),
