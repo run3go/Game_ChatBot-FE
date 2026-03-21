@@ -30,12 +30,12 @@ export const GRADE_STYLE: Record<
     text: 'text-blue-500',
     badge: 'bg-blue-500/20 text-blue-500 border border-blue-500/40',
     solidBadge: 'bg-blue-500 text-white',
-    background: 'bg-heroic-item',
+    background: 'bg-rare-item',
   },
   고급: {
     text: 'text-green-600',
     badge: 'bg-green-600/20 text-green-600 border border-green-600/40',
     solidBadge: 'bg-green-600 text-white',
-    background: 'bg-heroic-item',
+    background: 'bg-advanced-item',
   },
 };

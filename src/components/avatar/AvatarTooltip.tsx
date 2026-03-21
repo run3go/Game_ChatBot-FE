@@ -59,34 +59,34 @@ export default function AvatarTooltip({ avatar, children, align = 'right' }: Pro
             style={{ top: pos.top, left: pos.left }}
           >
             {/* 이름 */}
-            <p className={`text-sm font-bold leading-snug ${gradeStyle?.text ?? 'text-gray-200'}`}>
+            <p className={`text-base font-bold leading-snug ${gradeStyle?.text ?? 'text-gray-200'}`}>
               {avatar.name}
             </p>
 
             {/* 등급 · 슬롯 */}
-            <p className="mt-0.5 text-[11px] text-gray-500">
+            <p className="mt-0.5 text-[13px] text-gray-500">
               {avatar.grade} {avatar.type}
             </p>
 
             {/* 기본 효과 */}
             {avatar.basic_effect && (
               <div className="mt-2.5 border-t border-white/10 pt-2.5">
-                <p className="mb-1 text-[10px] font-semibold tracking-wide text-gray-500 uppercase">
+                <p className="mb-1 text-[12px] font-semibold tracking-wide text-gray-500 uppercase">
                   기본 효과
                 </p>
-                <p className="text-xs text-gray-300">{avatar.basic_effect}</p>
+                <p className="text-sm text-gray-300">{avatar.basic_effect}</p>
               </div>
             )}
 
             {/* 성향 */}
             {tendencyLines.length > 0 && (
               <div className="mt-2.5 border-t border-white/10 pt-2.5">
-                <p className="mb-1 text-[10px] font-semibold tracking-wide text-gray-500 uppercase">
+                <p className="mb-1 text-[12px] font-semibold tracking-wide text-gray-500 uppercase">
                   성향
                 </p>
                 <div className="space-y-0.5">
                   {tendencyLines.map((line, i) => (
-                    <p key={i} className="text-xs text-gray-300">
+                    <p key={i} className="text-sm text-gray-300">
                       {line}
                     </p>
                   ))}

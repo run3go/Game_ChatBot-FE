@@ -40,6 +40,14 @@
   .bg-heroic-item {
     background: linear-gradient(180deg, #430d57 0%, #22062c 100%);
   }
+
+  .bg-rare-item {
+    background: linear-gradient(180deg, #0d3a84 0%, #061a3c 100%);
+  }
+
+  .bg-advanced-item {
+    background: linear-gradient(180deg, #145a1e 0%, #062b0a 100%);
+  }
 }
 
 html {

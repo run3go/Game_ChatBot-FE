@@ -1,9 +1,9 @@
 'use client';
 
 import Home from '@/components/home/Home';
-import { DUMMY_AVATAR } from '@/lib/datas/avatar_data';
-import { AvatarResult } from '@/types/avatar';
+import { DUMMY_PROFILE } from '@/lib/datas/profile_data';
 import { ChatMessage } from '@/types/chat';
+import { ProfileResult } from '@/types/profile';
 import { IconMessageChatbotFilled } from '@tabler/icons-react';
 import { useEffect, useRef, useState } from 'react';
 import ChatInput from './ChatInput';
@@ -15,7 +15,8 @@ import UIContainer from './UIContainer';
 // const response: { result: CollectibleResult } = DUMMY_COLLECTIBLE;
 // const response: { result: EngravingResult } = DUMMY_ENGRAVING;
 // const response: { result: ExpeditionResult } = DUMMY_EXPEDITION;
-const response: { result: AvatarResult } = DUMMY_AVATAR;
+// const response: { result: AvatarResult } = DUMMY_AVATAR;
+const response: { result: ProfileResult } = DUMMY_PROFILE;
 
 export default function ChatContainer() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);

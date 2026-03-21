@@ -1,36 +1,9 @@
 import { GRADE_STYLE } from '@/lib/datas/color';
+import highlightText from '@/lib/utils/highlightText';
 import { ArkGridCoreItem, ArkGridGemItem } from '@/types/ark_grid';
 import Image from 'next/image';
 import { useState } from 'react';
 import GemStack from './GemStack';
-
-function highlightText(text: string) {
-  const parts = text
-    .split(/([\d]+\.?\d*%?)|(증가|감소|획득?)|('[^']+'|"[^"]+")/)
-    .filter(Boolean);
-
-  return parts.map((part, i) => {
-    if (/^[\d]+\.?\d*초?$/.test(part))
-      return (
-        <span key={i} className="text-[#dac04d]">
-          {part}
-        </span>
-      );
-    if (/^[\d]+\.?\d*%?$/.test(part))
-      return (
-        <span key={i} className="text-[#56c558]">
-          {part}
-        </span>
-      );
-    if (/^['"][^'"]+['"]$/.test(part))
-      return (
-        <span key={i} className="text-[#a185d0]">
-          {part}
-        </span>
-      );
-    return part;
-  });
-}
 
 function formatCoreOption(text: string, point: number) {
   let currentRequired = 0;
