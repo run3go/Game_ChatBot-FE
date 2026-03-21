@@ -48,25 +48,25 @@ html {
 }
 
 /* Custom scrollbar */
-::-webkit-scrollbar {
+:not(.scrollbar-hide)::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
-::-webkit-scrollbar-track {
+:not(.scrollbar-hide)::-webkit-scrollbar-track {
   background: transparent;
 }
 
-::-webkit-scrollbar-thumb {
+:not(.scrollbar-hide)::-webkit-scrollbar-thumb {
   background: #6366f1;
   border-radius: 9999px;
 }
 
-::-webkit-scrollbar-thumb:hover {
+:not(.scrollbar-hide)::-webkit-scrollbar-thumb:hover {
   background: #8b5cf6;
 }
 
-* {
+*:not(.scrollbar-hide) {
   scrollbar-width: thin;
   scrollbar-color: #6366f1 transparent;
 }
