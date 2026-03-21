@@ -46,3 +46,27 @@ html {
   font-size: 16px;
   font-family: 'Inter';
 }
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #6366f1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8b5cf6;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #6366f1 transparent;
+}
