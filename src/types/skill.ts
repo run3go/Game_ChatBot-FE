@@ -16,9 +16,9 @@ export interface ArmorySkill {
   stagger: Stagger;
   attack_type: string | null;
   is_counter: boolean;
-  tripod_1_name: string;
-  tripod_2_name: string;
-  tripod_3_name: string;
+  tripod_1_name: string | null;
+  tripod_2_name: string | null;
+  tripod_3_name: string | null;
   rune_name: string | null;
   rune_grade: RuneGrade;
   tooltip: string;

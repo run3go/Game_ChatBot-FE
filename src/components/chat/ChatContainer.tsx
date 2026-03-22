@@ -1,15 +1,16 @@
 'use client';
 
 import Home from '@/components/home/Home';
-import { DUMMY_SKILLS } from '@/lib/datas/skilldata';
+import { DUMMY_TOTAL_INFO } from '@/lib/datas/total_info_data';
 import { ChatMessage } from '@/types/chat';
-import { SkillResult } from '@/types/skill';
+import { TotalInfoResult } from '@/types/total_info';
 import { IconMessageChatbotFilled } from '@tabler/icons-react';
 import { useEffect, useRef, useState } from 'react';
 import ChatInput from './ChatInput';
 import UIContainer from './UIContainer';
 
-const response: { result: SkillResult } = DUMMY_SKILLS;
+const response: { result: TotalInfoResult } = DUMMY_TOTAL_INFO;
+// const response: { result: SkillResult } = DUMMY_SKILLS;
 // const response: { result: ArkGridResult } = DUMMY_ARK_GRID;
 // const response: { result: ArkPassiveResult } = DUMMY_ARK_PASSIVE;
 // const response: { result: CollectibleResult } = DUMMY_COLLECTIBLE;

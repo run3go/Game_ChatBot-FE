@@ -6,6 +6,7 @@ import { EngravingResult } from '@/types/engraving';
 import { ExpeditionResult } from '@/types/expedition';
 import { ProfileResult } from '@/types/profile';
 import { SkillResult } from '@/types/skill';
+import { TotalInfoResult } from '@/types/total_info';
 import ArkGrid from '../ark_grid/ArkGrid';
 import ArkPassive from '../ark_passive/ArkPassive';
 import AvatarList from '../avatar/AvatarList';
@@ -14,8 +15,9 @@ import EngravingList from '../engraving/EngravingList';
 import Expedition from '../expedition/Expedition';
 import Profile from '../profile/Profile';
 import SkillList from '../skill/SkillList';
+import TotalInfo from '../total_info/TotalInfo';
 
-type UIResult = ArkGridResult | SkillResult | ArkPassiveResult | CollectibleResult | EngravingResult | ExpeditionResult | AvatarResult | ProfileResult;
+type UIResult = ArkGridResult | SkillResult | ArkPassiveResult | CollectibleResult | EngravingResult | ExpeditionResult | AvatarResult | ProfileResult | TotalInfoResult;
 
 export default function UIContainer({ result }: { result: UIResult }) {
   const { ui_type, data } = result;
@@ -39,6 +41,8 @@ export default function UIContainer({ result }: { result: UIResult }) {
             return <AvatarList data={data} />;
           case 'PROFILE':
             return <Profile data={data} />;
+          case 'TOTAL_INFO':
+            return <TotalInfo data={data} />;
           default:
             return null;
         }
