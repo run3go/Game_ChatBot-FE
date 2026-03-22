@@ -39,13 +39,13 @@ export default function CharacterHeader({
           </div>
           <div className="text-center">
             <p className="text-xs text-gray-400">전투력</p>
-            <p className="text-lg font-bold text-blue-600">
+            <p className="text-lg font-bold">
               {profile.combat_power.toLocaleString()}
             </p>
           </div>
           <div className="text-center">
             <p className="text-xs text-gray-400">원정대</p>
-            <p className="text-lg font-bold text-purple-600">
+            <p className="text-lg font-bold text-purple-800">
               Lv.{profile.expedition_level}
             </p>
           </div>
@@ -56,6 +56,7 @@ export default function CharacterHeader({
           <Image
             src={profile.character_image}
             alt={profile.character_name}
+            sizes={'100'}
             fill
             quality={100}
             className="origin-center scale-[1.2] object-cover object-top"
