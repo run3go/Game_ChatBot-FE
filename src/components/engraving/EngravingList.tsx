@@ -11,7 +11,7 @@ export default function EngravingList({ data }: { data: EngravingData }) {
   const [selected, setSelected] = useState<ArmoryEngraving>(engravings[0]);
 
   return (
-    <div className="mt-4 flex gap-3">
+    <div className="flex gap-3">
       {/* 왼쪽 목록 */}
       <div className="min-w-60 rounded-2xl bg-white p-3 shadow-sm">
         <ul className="flex flex-col gap-1">

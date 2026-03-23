@@ -45,7 +45,7 @@ export default function TotalInfo({ data }: { data: TotalInfoData }) {
   }, [displayTab]);
 
   return (
-    <div className="mt-4 flex flex-col gap-0">
+    <div className="flex flex-col gap-0">
       {/* 탭 헤더 */}
       <div
         ref={containerRef}

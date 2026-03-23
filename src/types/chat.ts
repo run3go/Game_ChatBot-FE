@@ -1,3 +1,5 @@
+import { UIResult } from '@/components/chat/UIContainer';
+
 export type ChatRole = 'user' | 'bot';
 
 export type ChatMessage = {
@@ -5,4 +7,5 @@ export type ChatMessage = {
   role: ChatRole;
   content: string;
   ui_type?: string;
+  result?: UIResult;
 };

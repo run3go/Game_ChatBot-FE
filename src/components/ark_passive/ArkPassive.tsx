@@ -7,7 +7,7 @@ export default function ArkPassive({ data }: { data: ArkPassiveData }) {
   const effects = data.ark_passive_effects_tb;
   const points = data.ark_passive_points_tb;
   return (
-    <ul className="mt-6 flex">
+    <ul className="flex">
       {ARK_PASSIVE_NAMES.map((name) => (
         <PassiveItem key={name} name={name} effects={effects} points={points} />
       ))}

@@ -42,7 +42,7 @@ export default function Collectible({ data }: { data: CollectibleData }) {
   );
 
   return (
-    <div className="mt-4 flex gap-4">
+    <div className="flex gap-4">
       {/* 좌측: 수집품 목록 */}
       <div className="self-start">
         <div className="grid grid-cols-2 gap-x-4 gap-y-3">

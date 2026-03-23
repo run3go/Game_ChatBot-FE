@@ -27,7 +27,7 @@ export default function ArkGrid({ data }: { data: ArkGridData }) {
   const gems = data.ark_grid_gems_tb || [];
 
   return (
-    <div className="flex flex-col gap-4 py-4">
+    <div className="flex flex-col gap-4 pb-4">
       {/* 효과 요약 */}
       <div className="grid grid-cols-3 gap-3">
         {effects.map((effect) => (

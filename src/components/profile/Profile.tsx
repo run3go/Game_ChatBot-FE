@@ -12,7 +12,7 @@ export default function Profile({ data }: { data: ProfileData }) {
   const gemEffect = data.armory_gem_effects_tb[0];
 
   return (
-    <div className="mt-4 flex flex-col gap-3">
+    <div className="flex flex-col gap-3">
       <CharacterHeader profile={profile} />
       <EquipmentSection equipment={data.armory_equipment_tb} />
       <StatsSection profile={profile} />

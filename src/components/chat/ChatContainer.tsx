@@ -1,41 +1,35 @@
 'use client';
 
 import Home from '@/components/home/Home';
-import { DUMMY_TOTAL_INFO } from '@/lib/datas/total_info_data';
+import { askAI } from '@/lib/apis/askAI';
 import { ChatMessage } from '@/types/chat';
-import { TotalInfoResult } from '@/types/total_info';
 import { IconMessageChatbotFilled } from '@tabler/icons-react';
 import { useEffect, useRef, useState } from 'react';
 import ChatInput from './ChatInput';
 import UIContainer from './UIContainer';
 
-const response: { result: TotalInfoResult } = DUMMY_TOTAL_INFO;
-// const response: { result: SkillResult } = DUMMY_SKILLS;
-// const response: { result: ArkGridResult } = DUMMY_ARK_GRID;
-// const response: { result: ArkPassiveResult } = DUMMY_ARK_PASSIVE;
-// const response: { result: CollectibleResult } = DUMMY_COLLECTIBLE;
-// const response: { result: EngravingResult } = DUMMY_ENGRAVING;
-// const response: { result: ExpeditionResult } = DUMMY_EXPEDITION;
-// const response: { result: AvatarResult } = DUMMY_AVATAR;
-// const response: { result: ProfileResult } = DUMMY_PROFILE;
-
 export default function ChatContainer() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const bottomRef = useRef<HTMLDivElement>(null);
-
-  const handleSend = (text: string) => {
+  const handleSend = async (text: string) => {
     const userMsg: ChatMessage = {
       id: `${Date.now()}-user`,
       role: 'user',
       content: text,
     };
-    const botMsg: ChatMessage = {
-      id: `${Date.now()}-bot`,
-      role: 'bot',
-      content: `"${text}"에 대한 결과를 가져오는 중입니다...`,
-      ui_type: 'ARK_GRID',
-    };
-    setMessages((prev) => [...prev, userMsg, botMsg]);
+    const botMsgId = `${Date.now()}-bot`;
+    setMessages((prev) => [
+      ...prev,
+      userMsg,
+      { id: botMsgId, role: 'bot', content: '답변을 가져오는 중입니다...' },
+    ]);
+
+    const data = await askAI(text);
+    setMessages((prev) =>
+      prev.map((msg) =>
+        msg.id === botMsgId ? { ...msg, content: '', result: data } : msg,
+      ),
+    );
   };
 
   useEffect(() => {
@@ -53,7 +47,7 @@ export default function ChatContainer() {
             {messages.map((msg) =>
               msg.role === 'user' ? (
                 /* 사용자 메시지 */
-                <div key={msg.id} className="flex justify-end">
+                <div key={msg.id} className="flex justify-end mt-5">
                   <div className="max-w-[75%] rounded-2xl bg-linear-to-r from-indigo-500 to-violet-500 px-4 py-2.5 text-sm font-medium text-white shadow-sm">
                     {msg.content}
                   </div>
@@ -68,7 +62,7 @@ export default function ChatContainer() {
                     <div className="px-4 text-sm text-gray-700">
                       {msg.content}
                     </div>
-                    <UIContainer result={response.result} />
+                    <UIContainer result={msg.result} />
                   </div>
                 </div>
               ),

@@ -19,7 +19,7 @@ export default function Expedition({ data }: { data: ExpeditionData }) {
   );
 
   return (
-    <div className="mt-4 flex flex-col gap-6">
+    <div className="flex flex-col gap-6">
       {tooltip && (
         <div
           className="pointer-events-none fixed z-50 rounded bg-gray-800/70 px-2 py-1 text-xs text-white shadow-lg"

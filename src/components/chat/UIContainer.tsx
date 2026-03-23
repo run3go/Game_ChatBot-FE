@@ -17,12 +17,25 @@ import Profile from '../profile/Profile';
 import SkillList from '../skill/SkillList';
 import TotalInfo from '../total_info/TotalInfo';
 
-type UIResult = ArkGridResult | SkillResult | ArkPassiveResult | CollectibleResult | EngravingResult | ExpeditionResult | AvatarResult | ProfileResult | TotalInfoResult;
+type UIResult =
+  | ArkGridResult
+  | SkillResult
+  | ArkPassiveResult
+  | CollectibleResult
+  | EngravingResult
+  | ExpeditionResult
+  | AvatarResult
+  | ProfileResult
+  | TotalInfoResult;
 
-export default function UIContainer({ result }: { result: UIResult }) {
+export type { UIResult };
+
+export default function UIContainer({ result }: { result?: UIResult }) {
+  if (!result) return null;
   const { ui_type, data } = result;
+  console.log(ui_type, data);
   return (
-    <div>
+    <div className="mt-4">
       {(() => {
         switch (ui_type) {
           case 'SKILL':

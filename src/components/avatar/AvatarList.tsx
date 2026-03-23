@@ -34,7 +34,7 @@ export default function AvatarList({ data }: { data: AvatarData }) {
   );
 
   return (
-    <div className="mt-3 rounded-2xl bg-[#14181d]">
+    <div className="rounded-2xl bg-[#14181d]">
       {/* 헤더 */}
       {profile && (
         <div className="border-b border-white/10 px-5 py-3">
