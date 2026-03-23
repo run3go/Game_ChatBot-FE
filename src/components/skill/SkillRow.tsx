@@ -18,6 +18,7 @@ const GEM_SHORT_NAME: Record<string, string> = {
   작열의: '작',
   멸화의: '멸',
   홍염의: '홍',
+  광휘의: '광',
 };
 
 interface Props {
@@ -57,7 +58,11 @@ function extractDescription(tooltip: string): string | null {
   }
 }
 
-export default function SkillRow({ skill, gems = [], tooltipUp = false }: Props) {
+export default function SkillRow({
+  skill,
+  gems = [],
+  tooltipUp = false,
+}: Props) {
   const tripods = [
     skill.tripod_1_name,
     skill.tripod_2_name,
@@ -65,7 +70,11 @@ export default function SkillRow({ skill, gems = [], tooltipUp = false }: Props)
   ];
 
   const description = extractDescription(skill.tooltip);
-  const [tripodTooltip, setTripodTooltip] = useState<{ name: string; x: number; y: number } | null>(null);
+  const [tripodTooltip, setTripodTooltip] = useState<{
+    name: string;
+    x: number;
+    y: number;
+  } | null>(null);
 
   return (
     <div className="flex items-center gap-3 rounded-xl bg-white px-4 py-3 shadow-sm">
@@ -87,7 +96,9 @@ export default function SkillRow({ skill, gems = [], tooltipUp = false }: Props)
 
         {/* 툴팁 */}
         {description && (
-          <div className={`pointer-events-none absolute left-12 z-50 hidden w-72 rounded-xl bg-gray-900 p-3 shadow-xl group-hover:block ${tooltipUp ? 'bottom-0' : 'top-0'}`}>
+          <div
+            className={`pointer-events-none absolute left-12 z-50 hidden w-72 rounded-xl bg-gray-900 p-3 shadow-xl group-hover:block ${tooltipUp ? 'bottom-0' : 'top-0'}`}
+          >
             <p className="mb-1 text-xs font-semibold text-white">
               {skill.skill_name}
             </p>
@@ -138,12 +149,18 @@ export default function SkillRow({ skill, gems = [], tooltipUp = false }: Props)
               onMouseEnter={(e) => {
                 const el = e.currentTarget;
                 if (tripod && el.scrollWidth > el.clientWidth) {
-                  setTripodTooltip({ name: tripod, x: e.clientX, y: e.clientY });
+                  setTripodTooltip({
+                    name: tripod,
+                    x: e.clientX,
+                    y: e.clientY,
+                  });
                 }
               }}
               onMouseMove={(e) => {
                 if (tripodTooltip) {
-                  setTripodTooltip((prev) => prev && { ...prev, x: e.clientX, y: e.clientY });
+                  setTripodTooltip(
+                    (prev) => prev && { ...prev, x: e.clientX, y: e.clientY },
+                  );
                 }
               }}
               onMouseLeave={() => setTripodTooltip(null)}
