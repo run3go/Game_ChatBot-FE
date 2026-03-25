@@ -33,7 +33,6 @@ export type { UIResult };
 export default function UIContainer({ result }: { result?: UIResult }) {
   if (!result) return null;
   const { ui_type, data } = result;
-  console.log(ui_type, data);
   return (
     <div className="mt-4">
       {(() => {

@@ -1,24 +1,18 @@
-export const askAI = async (question: string) => {
-  try {
-    const res = await fetch(
-      `http://localhost:8000/ask?question=${encodeURIComponent(question)}`,
-    );
-    const data = await res.json();
-    return data.result;
-  } catch (e) {
-    console.error(e);
-  }
-};
+type HistoryMessage = { role: 'user' | 'assistant'; content: string };
 
 export const askAIStream = async (
   question: string,
+  history: HistoryMessage[],
   onChunk: (chunk: string) => void,
   onStructured: (payload: unknown) => void,
+  pending?: Record<string, unknown>,
 ) => {
   try {
-    const res = await fetch(
-      `http://localhost:8000/ask/stream?question=${encodeURIComponent(question)}`,
-    );
+    const res = await fetch('http://localhost:8000/ask/stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ question, history, pending: pending ?? null }),
+    });
     const reader = res.body!.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
@@ -45,6 +39,6 @@ export const askAIStream = async (
       }
     }
   } catch (e) {
-    console.error(e);
+    throw e;
   }
 };
