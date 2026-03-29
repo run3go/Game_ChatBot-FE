@@ -24,52 +24,17 @@ const GEM_SHORT_NAME: Record<string, string> = {
 interface Props {
   skill: ArmorySkill;
   gems?: ArmoryGem[];
-  tooltipUp?: boolean;
 }
 
 const TRIPOD_COLORS = ['bg-teal-400', 'bg-indigo-400', 'bg-violet-400'];
 
-function convertLOAHtml(html: string): string {
-  return html
-    .replace(/<FONT COLOR='([^']+)'>/g, '<span style="color:$1">')
-    .replace(/<FONT SIZE='\d+'>/g, '')
-    .replace(/<\/FONT>/g, '</span>')
-    .replace(/<font color='([^']+)'>/g, '<span style="color:$1">')
-    .replace(/<\/font>/g, '</span>')
-    .replace(/<BR>/g, '<br/>');
-}
-
-function extractDescription(tooltip: string): string | null {
-  try {
-    const data = JSON.parse(tooltip);
-    for (const key of Object.keys(data)) {
-      const el = data[key];
-      if (
-        el.type === 'SingleTextBox' &&
-        typeof el.value === 'string' &&
-        el.value.includes('efefdf')
-      ) {
-        return convertLOAHtml(el.value);
-      }
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-export default function SkillRow({
-  skill,
-  gems = [],
-  tooltipUp = false,
-}: Props) {
+export default function SkillRow({ skill, gems = [] }: Props) {
   const tripods = [
     skill.tripod_1_name,
     skill.tripod_2_name,
     skill.tripod_3_name,
   ];
 
-  const description = extractDescription(skill.tooltip);
   const [tripodTooltip, setTripodTooltip] = useState<{
     name: string;
     x: number;
@@ -78,40 +43,21 @@ export default function SkillRow({
 
   return (
     <div className="flex items-center gap-3 rounded-xl bg-white px-4 py-3 shadow-sm">
-      {/* 스킬 아이콘 + 툴팁 */}
-      <div className="group relative shrink-0">
+      {/* 스킬 아이콘 */}
+      <div className="shrink-0">
         <div className="size-10 overflow-hidden rounded-lg bg-indigo-100 ring-2 ring-indigo-200">
-          {skill.icon ? (
+          {skill.skill_icon_url ? (
             <Image
-              src={skill.icon}
-              alt={skill.skill_name}
-              width={100}
-              height={100}
-              className="h-full w-full object-cover"
+              src={skill.skill_icon_url ?? ''}
+              alt="스킬 이미지"
+              width={40}
+              height={40}
+              className="h-full w-full"
             />
           ) : (
             <div className="h-full w-full bg-linear-to-br from-indigo-300 to-violet-400" />
           )}
         </div>
-
-        {/* 툴팁 */}
-        {description && (
-          <div
-            className={`pointer-events-none absolute left-12 z-50 hidden w-72 rounded-xl bg-gray-900 p-3 shadow-xl group-hover:block ${tooltipUp ? 'bottom-0' : 'top-0'}`}
-          >
-            <p className="mb-1 text-xs font-semibold text-white">
-              {skill.skill_name}
-            </p>
-            <div className="mb-2 flex gap-3 text-[10px] text-gray-400">
-              <span>재사용 {skill.cooldown}초</span>
-              <span>마나 {skill.mana_cost}</span>
-            </div>
-            <div
-              className="text-[11px] leading-5"
-              dangerouslySetInnerHTML={{ __html: description }}
-            />
-          </div>
-        )}
       </div>
 
       {/* 스킬 이름 + 레벨 */}

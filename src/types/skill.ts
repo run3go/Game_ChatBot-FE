@@ -6,10 +6,9 @@ export interface ArmoryGemEffect {
 export interface ArmorySkill {
   character_name: string;
   skill_name: string;
-  icon: string;
+  collected_at: string;
   skill_level: number;
   type: SkillType;
-  skill_type: string; // 예: "0"
   cooldown: number;
   mana_cost: number;
   weak_point: number;
@@ -21,7 +20,11 @@ export interface ArmorySkill {
   tripod_3_name: string | null;
   rune_name: string | null;
   rune_grade: RuneGrade;
-  tooltip: string;
+  rune_effect: string | null;
+  skill_icon_url: string | null;
+  req_points: string | null;
+  resource_cost: string | null;
+  description: string | null;
 }
 
 type SkillType = '일반' | '콤보' | '지점' | '차지' | '캐스팅' | '홀딩' | '토글';

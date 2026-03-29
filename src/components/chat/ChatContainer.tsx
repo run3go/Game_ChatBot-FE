@@ -22,10 +22,6 @@ export default function ChatContainer() {
   const lastPairRef = useRef<HTMLDivElement>(null);
   const [lastUserMsgId, setLastUserMsgId] = useState<string | null>(null);
   const [streamingId, setStreamingId] = useState<string | null>(null);
-  const [pendingContext, setPendingContext] = useState<Record<
-    string,
-    unknown
-  > | null>(null);
 
   // 봇 메시지 업데이트
   const updateBotMsg = (id: string, update: Partial<ChatMessage>) =>
@@ -46,11 +42,10 @@ export default function ChatContainer() {
       { id: botMsgId, role: 'bot', content: '' },
     ]);
 
-    const currentPending = pendingContext;
-    setPendingContext(null);
-
     let botContent = '';
     let botStructuredLabel = '';
+    let userMsgNicknames: string[] | undefined;
+    let userMsgKeywords: string[] | undefined;
 
     const onChunk = (chunk: string) => {
       botContent += chunk;
@@ -60,36 +55,32 @@ export default function ChatContainer() {
     const onStructured = (payload: unknown) => {
       const p = payload as {
         ui_type: string;
-        message?: string;
-        pending?: Record<string, unknown>;
         nickname?: string;
+        nicknames?: string[];
+        keywords?: string[];
       };
 
-      if (p.ui_type === 'FOLLOW_UP') {
-        botContent = p.message ?? '';
-        setPendingContext(p.pending ?? null);
-        updateBotMsg(botMsgId, { content: botContent });
-      } else {
-        botStructuredLabel = p.nickname
-          ? `[${p.nickname}의 ${p.ui_type} 데이터 표시]`
-          : `[${p.ui_type} 데이터 표시]`;
-        updateBotMsg(botMsgId, { content: '', result: payload as never });
-      }
+      if (p.nicknames?.length) userMsgNicknames = p.nicknames;
+      if (p.keywords?.length) userMsgKeywords = p.keywords;
+
+      botStructuredLabel = p.nickname
+        ? `[${p.nickname}의 ${p.ui_type} 데이터 표시]`
+        : `[${p.ui_type} 데이터 표시]`;
+      updateBotMsg(botMsgId, { content: '', result: payload as never });
     };
 
     try {
-      await askAIStream(
-        text,
-        history,
-        onChunk,
-        onStructured,
-        currentPending ?? undefined,
-      );
+      await askAIStream(text, history, onChunk, onStructured);
 
       setHistory((prev) =>
         [
           ...prev,
-          { role: 'user' as const, content: text },
+          {
+            role: 'user' as const,
+            content: text,
+            ...(userMsgNicknames && { nicknames: userMsgNicknames }),
+            ...(userMsgKeywords && { keywords: userMsgKeywords }),
+          },
           {
             role: 'assistant' as const,
             content: botContent || botStructuredLabel,

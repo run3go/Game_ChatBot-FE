@@ -6,14 +6,14 @@ interface ChatStore {
   chatId: string | null;
   pendingMessage: string | null;
   messages: ChatMessage[];
-  history: { role: 'user' | 'assistant'; content: string }[];
+  history: { role: 'user' | 'assistant'; content: string; nicknames?: string[]; keywords?: string[] }[];
   setChatId: (id: string) => void;
   setPendingMessage: (msg: string | null) => void;
   setMessages: (updater: (prev: ChatMessage[]) => ChatMessage[]) => void;
   setHistory: (
     updater: (
-      prev: { role: 'user' | 'assistant'; content: string }[],
-    ) => { role: 'user' | 'assistant'; content: string }[],
+      prev: { role: 'user' | 'assistant'; content: string; nicknames?: string[]; keywords?: string[] }[],
+    ) => { role: 'user' | 'assistant'; content: string; nicknames?: string[]; keywords?: string[] }[],
   ) => void;
   resetChat: () => void;
 }

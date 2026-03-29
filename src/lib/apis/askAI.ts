@@ -1,17 +1,16 @@
-type HistoryMessage = { role: 'user' | 'assistant'; content: string };
+type HistoryMessage = { role: 'user' | 'assistant'; content: string; nicknames?: string[]; keywords?: string[] };
 
 export const askAIStream = async (
   question: string,
   history: HistoryMessage[],
   onChunk: (chunk: string) => void,
   onStructured: (payload: unknown) => void,
-  pending?: Record<string, unknown>,
 ) => {
   try {
     const res = await fetch('http://localhost:8000/ask/stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question, history, pending: pending ?? null }),
+      body: JSON.stringify({ question, history }),
     });
     const reader = res.body!.getReader();
     const decoder = new TextDecoder();

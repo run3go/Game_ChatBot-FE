@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  reactStrictMode: false,
   reactCompiler: true,
   images: {
     qualities: [75, 100],
@@ -13,6 +14,11 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'img.lostark.co.kr',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'static.inven.co.kr',
         pathname: '/**',
       },
     ],
