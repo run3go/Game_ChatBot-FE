@@ -1,4 +1,9 @@
-type HistoryMessage = { role: 'user' | 'assistant'; content: string; nicknames?: string[]; keywords?: string[] };
+type HistoryMessage = {
+  role: 'user' | 'assistant';
+  content: string;
+  nicknames?: string[];
+  keywords?: string[];
+};
 
 export const askAIStream = async (
   question: string,
@@ -7,11 +12,14 @@ export const askAIStream = async (
   onStructured: (payload: unknown) => void,
 ) => {
   try {
-    const res = await fetch('http://localhost:8000/ask/stream', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question, history }),
-    });
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/ask/stream`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, history }),
+      },
+    );
     const reader = res.body!.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
