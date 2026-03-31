@@ -1,6 +1,6 @@
 'use client';
 
-import { askAIStream } from '@/lib/apis/askAI';
+import { askAIStream, triggerUpdate } from '@/lib/apis/askAI';
 import { useChatStore } from '@/store/chatStore';
 import { ChatMessage } from '@/types/chat';
 import { IconMessageChatbotFilled } from '@tabler/icons-react';
@@ -20,8 +20,12 @@ export default function ChatContainer() {
   } = useChatStore();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const lastPairRef = useRef<HTMLDivElement>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
   const [lastUserMsgId, setLastUserMsgId] = useState<string | null>(null);
   const [streamingId, setStreamingId] = useState<string | null>(null);
+  const [inputValue, setInputValue] = useState('');
+  const [statusText, setStatusText] = useState('');
+  const pendingNicknameRef = useRef<string | null>(null);
 
   // 봇 메시지 업데이트
   const updateBotMsg = (id: string, update: Partial<ChatMessage>) =>
@@ -29,16 +33,58 @@ export default function ChatContainer() {
       prev.map((msg) => (msg.id === id ? { ...msg, ...update } : msg)),
     );
 
+  const handleCancel = () => {
+    abortControllerRef.current?.abort();
+  };
+
   // 사용자 질문 전송 및 답변 반환
-  const handleSend = async (text: string) => {
+  const handleSend = async (text?: string) => {
+    const question = text ?? inputValue;
+    if (!question.trim()) return;
+
+    // 수집 대기 중인 캐릭터가 있고 긍정 응답이면 trigger-update 호출
+    if (pendingNicknameRef.current && question.trim() === '예') {
+      const nickname = pendingNicknameRef.current;
+      pendingNicknameRef.current = null;
+      const userMsgId = `${Date.now()}-user`;
+      const botMsgId = `${Date.now()}-bot`;
+      setMessages((prev) => [
+        ...prev,
+        { id: userMsgId, role: 'user', content: question },
+        { id: botMsgId, role: 'bot', content: '' },
+      ]);
+      try {
+        await triggerUpdate(nickname);
+        updateBotMsg(botMsgId, {
+          content: `${nickname} 데이터 수집을 시작했어요! 잠시 후 다시 질문해 주세요.`,
+        });
+      } catch {
+        updateBotMsg(botMsgId, {
+          content: '수집 요청에 실패했습니다. 잠시 후 다시 시도해 주세요.',
+        });
+      }
+      setInputValue('');
+      return;
+    }
+
+    pendingNicknameRef.current = null;
+
     const userMsgId = `${Date.now()}-user`;
     const botMsgId = `${Date.now()}-bot`;
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+    let timedOut = false;
+    const timeoutId = setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, 30000);
 
     setLastUserMsgId(userMsgId);
     setStreamingId(botMsgId);
     setMessages((prev) => [
       ...prev,
-      { id: userMsgId, role: 'user', content: text },
+      { id: userMsgId, role: 'user', content: question },
       { id: botMsgId, role: 'bot', content: '' },
     ]);
 
@@ -69,15 +115,31 @@ export default function ChatContainer() {
       updateBotMsg(botMsgId, { content: '', result: payload as never });
     };
 
+    const onConfirmCollect = (nickname: string) => {
+      pendingNicknameRef.current = nickname;
+    };
+
+    const onStatus = (status: string) => {
+      setStatusText(status);
+    };
+
     try {
-      await askAIStream(text, history, onChunk, onStructured);
+      await askAIStream(
+        question,
+        history,
+        onChunk,
+        onStructured,
+        onConfirmCollect,
+        onStatus,
+        controller.signal,
+      );
 
       setHistory((prev) =>
         [
           ...prev,
           {
             role: 'user' as const,
-            content: text,
+            content: question,
             ...(userMsgNicknames && { nicknames: userMsgNicknames }),
             ...(userMsgKeywords && { keywords: userMsgKeywords }),
           },
@@ -88,11 +150,22 @@ export default function ChatContainer() {
         ].slice(-10),
       );
     } catch {
-      updateBotMsg(botMsgId, {
-        content: '죄송해요, 요청을 처리하지 못했어요. 다시 시도해 주세요.',
-      });
+      if (timedOut) {
+        updateBotMsg(botMsgId, {
+          content: '응답 시간이 초과되었어요. 다시 시도해 주세요.',
+        });
+      } else if (!controller.signal.aborted) {
+        updateBotMsg(botMsgId, {
+          content: '죄송해요, 요청을 처리하지 못했어요. 다시 시도해 주세요.',
+        });
+      }
     } finally {
+      clearTimeout(timeoutId);
+      const aborted = controller.signal.aborted;
       setStreamingId(null);
+      setStatusText('');
+      if (!aborted) setInputValue('');
+      abortControllerRef.current = null;
     }
   };
 
@@ -130,26 +203,32 @@ export default function ChatContainer() {
             className={`flex flex-col px-6 py-6 ${idx === pairs.length - 1 ? 'min-h-full' : ''}`}
           >
             <div className="flex justify-end">
-              <div className="max-w-[75%] rounded-2xl bg-linear-to-r from-indigo-500 to-violet-500 px-4 py-2.5 text-sm font-medium text-white shadow-sm">
+              <div className="max-w-[75%] rounded-2xl bg-linear-to-r from-indigo-500 to-violet-500 px-4 py-2.5 text-sm font-medium whitespace-pre-wrap text-white shadow-sm">
                 {user.content}
               </div>
             </div>
 
             {bot && (
               <div className="mt-6 flex items-start">
-                <div className="grid size-8 shrink-0 place-items-center rounded-xl bg-linear-to-r from-indigo-500 to-violet-500 shadow-sm">
+                <div
+                  className={`grid size-8 shrink-0 place-items-center rounded-xl bg-linear-to-r from-indigo-500 to-violet-500 shadow-sm ${streamingId === bot.id ? 'animate-pulse' : ''}`}
+                >
                   <IconMessageChatbotFilled size={18} color="white" />
                 </div>
-                <div className="w-full py-2.5">
+                <div className="w-full pb-1.5">
                   {streamingId === bot.id && bot.content === '' ? (
-                    <div className="flex items-center gap-1 px-4 py-1">
-                      <span className="size-2 animate-bounce rounded-full bg-indigo-400 [animation-delay:-0.3s]" />
-                      <span className="size-2 animate-bounce rounded-full bg-indigo-400 [animation-delay:-0.15s]" />
-                      <span className="size-2 animate-bounce rounded-full bg-indigo-400" />
+                    <div className="pt-1">
+                      <TypingText
+                        key={statusText}
+                        content={statusText}
+                        speed={30}
+                      />
                     </div>
                   ) : (
                     <>
-                      <TypingText content={bot.content} />
+                      <div className="pt-1">
+                        <TypingText content={bot.content} />
+                      </div>
                       <UIContainer result={bot.result} />
                     </>
                   )}
@@ -161,7 +240,13 @@ export default function ChatContainer() {
       </div>
 
       <div className="shrink-0 border-t border-gray-100 bg-gray-50 px-4 py-4">
-        <ChatInput onSend={handleSend} />
+        <ChatInput
+          value={inputValue}
+          onChange={setInputValue}
+          onSend={handleSend}
+          onCancel={handleCancel}
+          isLoading={!!streamingId}
+        />
       </div>
     </div>
   );

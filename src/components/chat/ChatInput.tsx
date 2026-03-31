@@ -1,54 +1,77 @@
 'use client';
 
-import { IconSend } from '@tabler/icons-react';
-import { useState } from 'react';
+import { IconPlayerStopFilled, IconSend } from '@tabler/icons-react';
+import { useEffect, useRef } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 interface ChatInputProps {
-  onSend?: (message: string) => void;
+  value: string;
+  onChange: (value: string) => void;
+  onSend?: () => void;
+  onCancel?: () => void;
+  isLoading?: boolean;
 }
 
-export default function ChatInput({ onSend }: ChatInputProps) {
-  const [value, setValue] = useState('');
+export default function ChatInput({
+  value,
+  onChange,
+  onSend,
+  onCancel,
+  isLoading,
+}: ChatInputProps) {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const handleSend = () => {
-    if (!value.trim()) return;
-    onSend?.(value.trim());
-    setValue('');
-  };
+  useEffect(() => {
+    const el = textareaRef.current;
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${el.scrollHeight}px`;
+  }, [value]);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      onSend?.();
     }
   };
 
   return (
     <div className="w-full">
-      <div className="flex items-center gap-3 rounded-xl border border-gray-300 bg-white px-4 py-3">
-        <input
-          type="text"
+      <div className={twMerge(
+        'flex items-center gap-3 rounded-xl border px-4 py-3 transition-colors',
+        isLoading ? 'border-indigo-200 bg-indigo-50' : 'border-gray-300 bg-white',
+      )}>
+        <textarea
+          ref={textareaRef}
+          rows={1}
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
+          disabled={isLoading}
           placeholder="챗봇에게 물어보기"
           className={twMerge(
-            'flex-1 bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-400',
+            'flex-1 resize-none bg-transparent text-sm outline-none transition-colors',
+            'max-h-40 overflow-y-auto leading-relaxed',
+            isLoading ? 'cursor-not-allowed text-gray-400' : 'text-gray-700 placeholder:text-gray-400',
           )}
         />
-        <button
-          onClick={handleSend}
-          disabled={!value.trim()}
-          className="grid size-9 place-items-center rounded-lg bg-linear-to-r from-indigo-500 to-violet-500 text-white transition-opacity hover:opacity-90 disabled:opacity-40"
-        >
-          <IconSend size={18} />
-        </button>
+        {isLoading ? (
+          <button
+            onClick={onCancel}
+            className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-lg bg-linear-to-r from-indigo-500 to-violet-500 text-white transition-opacity hover:opacity-90"
+          >
+            <IconPlayerStopFilled size={16} />
+          </button>
+        ) : (
+          <button
+            onClick={() => onSend?.()}
+            disabled={!value.trim()}
+            className="grid size-9 shrink-0 cursor-pointer place-items-center rounded-lg bg-linear-to-r from-indigo-500 to-violet-500 text-white transition-opacity hover:opacity-90 disabled:opacity-40"
+          >
+            <IconSend size={18} />
+          </button>
+        )}
       </div>
-      {/* <button className="mt-2 flex items-center gap-1.5 text-xs text-gray-400 transition-colors hover:text-gray-600">
-        <IconPhoto size={14} />
-        이미지 검색
-      </button> */}
     </div>
   );
 }

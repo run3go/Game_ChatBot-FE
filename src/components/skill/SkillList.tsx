@@ -5,7 +5,7 @@ export default function SkillList({ data }: { data: SkillData }) {
   const skills = data.armory_skills_tb;
   const gems = data.armory_gem_tb;
   return (
-    <div className="flex flex-col gap-4 pb-4">
+    <div className="flex flex-col gap-4">
       {/* 스킬 목록 */}
       <div className="flex flex-col gap-2">
         {skills.map((skill, i) => (

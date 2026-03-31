@@ -27,7 +27,7 @@ export default function ArkGrid({ data }: { data: ArkGridData }) {
   const gems = data.ark_grid_gems_tb || [];
 
   return (
-    <div className="flex flex-col gap-4 pb-4">
+    <div className="flex flex-col">
       {/* 효과 요약 */}
       <div className="grid grid-cols-3 gap-3">
         {effects.map((effect) => (
@@ -53,6 +53,7 @@ export default function ArkGrid({ data }: { data: ArkGridData }) {
             key={core.slot_index}
             core={core as ArkGridCoreItem}
             gems={gems.filter((g) => g.core_index === core.slot_index)}
+            defaultOpen={(data.ark_grid_cores_tb || []).length === 1}
           />
         ))}
       </div>

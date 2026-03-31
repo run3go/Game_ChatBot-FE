@@ -17,6 +17,12 @@ import Profile from '../profile/Profile';
 import SkillList from '../skill/SkillList';
 import TotalInfo from '../total_info/TotalInfo';
 
+type ConfirmCollectResult = {
+  ui_type: 'CONFIRM_COLLECT';
+  nickname: string;
+  message: string;
+};
+
 type UIResult =
   | ArkGridResult
   | SkillResult
@@ -26,35 +32,55 @@ type UIResult =
   | ExpeditionResult
   | AvatarResult
   | ProfileResult
-  | TotalInfoResult;
+  | TotalInfoResult
+  | ConfirmCollectResult;
 
-export type { UIResult };
+export type { UIResult, ConfirmCollectResult };
 
-export default function UIContainer({ result }: { result?: UIResult }) {
+export default function UIContainer({
+  result,
+  onConfirmCollect,
+}: {
+  result?: UIResult;
+  onConfirmCollect?: (nickname: string) => void;
+}) {
+  console.log(result);
   if (!result) return null;
-  const { ui_type, data } = result;
+  const { ui_type } = result;
   return (
-    <div className="mt-4">
+    <div className="pb-4 pl-4">
       {(() => {
         switch (ui_type) {
+          case 'CONFIRM_COLLECT':
+            return (
+              <div className="flex flex-col gap-3">
+                <p className="text-sm text-gray-700">{result.message}</p>
+                <button
+                  onClick={() => onConfirmCollect?.(result.nickname)}
+                  className="w-fit rounded-xl bg-linear-to-r from-indigo-500 to-violet-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:opacity-90"
+                >
+                  네, 수집할게요
+                </button>
+              </div>
+            );
           case 'SKILL':
-            return <SkillList data={data} />;
+            return <SkillList data={(result as SkillResult).data} />;
           case 'ARK_GRID':
-            return <ArkGrid data={data} />;
+            return <ArkGrid data={(result as ArkGridResult).data} />;
           case 'ARK_PASSIVE':
-            return <ArkPassive data={data} />;
+            return <ArkPassive data={(result as ArkPassiveResult).data} />;
           case 'COLLECTIBLE':
-            return <Collectible data={data} />;
+            return <Collectible data={(result as CollectibleResult).data} />;
           case 'ENGRAVING':
-            return <EngravingList data={data} />;
+            return <EngravingList data={(result as EngravingResult).data} />;
           case 'EXPEDITION':
-            return <Expedition data={data} />;
+            return <Expedition data={(result as ExpeditionResult).data} />;
           case 'AVATAR':
-            return <AvatarList data={data} />;
+            return <AvatarList data={(result as AvatarResult).data} />;
           case 'PROFILE':
-            return <Profile data={data} />;
+            return <Profile data={(result as ProfileResult).data} />;
           case 'TOTAL_INFO':
-            return <TotalInfo data={data} />;
+            return <TotalInfo data={(result as TotalInfoResult).data} />;
           default:
             return null;
         }

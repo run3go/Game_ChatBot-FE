@@ -5,49 +5,17 @@ import Image from 'next/image';
 import { useState } from 'react';
 import GemStack from './GemStack';
 
-function formatCoreOption(text: string, point: number) {
-  let currentRequired = 0;
-  return text.split('\n').map((line, i) => {
-    const match = line.match(/^(\[(\d+)P\])\s*(.*)/);
-    if (match) {
-      currentRequired = parseInt(match[2], 10);
-      const disabled = currentRequired > point;
-      return (
-        <p
-          key={i}
-          className={`text-xs leading-6 ${disabled ? 'opacity-40' : ''}`}
-        >
-          <span
-            className={`font-semibold ${disabled ? 'text-gray-600' : 'text-[#dfB801]'}`}
-          >
-            {match[1]}
-          </span>{' '}
-          <span className={disabled ? 'text-gray-900' : 'text-gray-700'}>
-            {disabled ? match[3] : highlightText(match[3])}
-          </span>
-        </p>
-      );
-    }
-    const disabled = currentRequired > point;
-    return (
-      <p
-        key={i}
-        className={`pl-8.5 text-xs leading-6 ${disabled ? 'text-gray-400 opacity-40' : 'text-gray-700'}`}
-      >
-        {disabled ? line : highlightText(line)}
-      </p>
-    );
-  });
-}
 
 export default function NodeRow({
   core,
   gems,
+  defaultOpen = false,
 }: {
   core: ArkGridCoreItem;
   gems: ArkGridGemItem[];
+  defaultOpen?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const style = GRADE_STYLE[core.grade];
 
   return (
@@ -95,7 +63,22 @@ export default function NodeRow({
         <div className="overflow-hidden">
           <div className="border-t border-gray-100 bg-gray-50/60 px-4 py-3">
             <div className="flex flex-col gap-0.5">
-              {formatCoreOption(core.core_option, core.point)}
+              {([1, 2, 3, 4, 5, 6] as const).map((i) => {
+                const reqPoint = core[`level_${i}_point`];
+                const option = core[`level_${i}_option`];
+                if (!option) return null;
+                const disabled = reqPoint != null && reqPoint > core.point;
+                return (
+                  <p key={i} className={`text-xs leading-6 ${disabled ? 'opacity-40' : ''}`}>
+                    <span className={`font-semibold ${disabled ? 'text-gray-600' : 'text-[#dfB801]'}`}>
+                      [{reqPoint}P]
+                    </span>{' '}
+                    <span className={disabled ? 'text-gray-900' : 'text-gray-700'}>
+                      {disabled ? option : highlightText(option)}
+                    </span>
+                  </p>
+                );
+              })}
             </div>
           </div>
         </div>

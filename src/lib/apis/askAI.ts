@@ -5,11 +5,26 @@ type HistoryMessage = {
   keywords?: string[];
 };
 
+export const triggerUpdate = async (characterName: string): Promise<void> => {
+  const res = await fetch(
+    `${process.env.NEXT_PUBLIC_API_BASE_URL}/trigger-update`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ character_name: characterName }),
+    },
+  );
+  if (!res.ok) throw new Error(await res.text());
+};
+
 export const askAIStream = async (
   question: string,
   history: HistoryMessage[],
   onChunk: (chunk: string) => void,
   onStructured: (payload: unknown) => void,
+  onConfirmCollect: (nickname: string) => void,
+  onStatus: (status: string) => void,
+  signal?: AbortSignal,
 ) => {
   try {
     const res = await fetch(
@@ -18,8 +33,10 @@ export const askAIStream = async (
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ question, history }),
+        signal,
       },
     );
+    console.log(res);
     const reader = res.body!.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
@@ -42,10 +59,15 @@ export const askAIStream = async (
           onChunk(parsed.content);
         } else if (parsed.type === 'structured') {
           onStructured(parsed.payload);
+        } else if (parsed.type === 'confirm_collect') {
+          onConfirmCollect(parsed.nickname);
+        } else if (parsed.type === 'status') {
+          onStatus(parsed.content);
         }
       }
     }
   } catch (e) {
+    if (e instanceof DOMException && e.name === 'AbortError') return;
     throw e;
   }
 };

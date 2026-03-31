@@ -1,50 +1,19 @@
 import highlightText from '@/lib/utils/highlightText';
 import { ArkGridGemItem } from '@/types/ark_grid';
 
-interface ParsedGemEffect {
-  willpower: string;
-  pointType: '질서' | '혼돈' | null;
-  pointValue: string;
-  effects: { header: string; level: string; description: string }[];
-}
-
-function parseGemEffect(raw: string): ParsedGemEffect {
-  const lines = raw
-    .split('\n')
-    .map((l) => l.trim())
-    .filter(Boolean);
-
-  const willpowerLine = lines.find((l) => l.startsWith('필요 의지력')) ?? '';
-  const pointLine = lines.find((l) => l.includes('포인트')) ?? '';
-  const pointType = pointLine.includes('질서')
-    ? '질서'
-    : pointLine.includes('혼돈')
-      ? '혼돈'
-      : null;
-  const pointValue = pointLine.split(':')[1]?.trim() ?? '';
-
-  const effects: { header: string; level: string; description: string }[] = [];
-  for (let i = 0; i < lines.length; i++) {
-    const match = lines[i].match(/^(\[.+?\])\s*(Lv\.\d+)$/);
-    if (match) {
-      effects.push({
-        header: match[1],
-        level: match[2],
-        description: lines[i + 1] ?? '',
-      });
-    }
-  }
-
-  return { willpower: willpowerLine, pointType, pointValue, effects };
-}
-
 export default function GemTooltip({ gem }: { gem: ArkGridGemItem }) {
-  const { willpower, pointType, pointValue, effects } = parseGemEffect(
-    gem.gem_effect,
-  );
-
-  const willpowerNum = willpower.match(/필요 의지력\s*:\s*(\d+)/)?.[1] ?? '';
-  const willpowerSub = willpower.match(/\((.+)\)/)?.[1] ?? '';
+  const effects = [
+    {
+      name: gem.effect_1_name,
+      level: gem.effect_1_level,
+      value: gem.effect_1_value,
+    },
+    {
+      name: gem.effect_2_name,
+      level: gem.effect_2_level,
+      value: gem.effect_2_value,
+    },
+  ].filter((e) => e.name);
 
   return (
     <div className="w-56 rounded-lg border border-white/10 bg-[#0a0a0a] px-3 py-3 shadow-2xl">
@@ -53,24 +22,28 @@ export default function GemTooltip({ gem }: { gem: ArkGridGemItem }) {
       </p>
 
       <div className="space-y-2">
-        <div className="flex items-start gap-2">
-          <div>
-            <span className="text-xs text-gray-200">
-              필요 의지력 :{' '}
-              <span className="font-semibold text-red-400">{willpowerNum}</span>
+        <div>
+          <span className="text-xs text-gray-200">
+            필요 의지력 :{' '}
+            <span className="font-semibold text-red-400">
+              {gem.required_willpower}
             </span>
-            {willpowerSub && (
-              <p className="text-[11px] text-gray-500">({willpowerSub})</p>
+            {gem.willpower_efficiency != null && (
+              <span className="text-gray-500">
+                {' '}
+                ({(gem.required_willpower ?? 0) + gem.willpower_efficiency} -
+                {gem.willpower_efficiency})
+              </span>
             )}
-          </div>
+          </span>
         </div>
 
-        {pointType && (
+        {gem.point_type && (
           <div className="flex items-center gap-2">
             <span className="text-xs text-gray-200">
-              {pointType} 포인트 :{' '}
+              {gem.point_type} 포인트 :{' '}
               <span className="font-semibold text-yellow-500">
-                {pointValue}
+                {gem.point_value}
               </span>
             </span>
           </div>
@@ -81,12 +54,12 @@ export default function GemTooltip({ gem }: { gem: ArkGridGemItem }) {
         {effects.map((e, i) => (
           <div key={i} className="space-y-0.5">
             <p className="text-xs font-semibold text-gray-100">
-              {e.header}{' '}
-              <span className="font-normal text-gray-400">{e.level}</span>
+              {e.name}{' '}
+              <span className="font-normal text-gray-400">Lv.{e.level}</span>
             </p>
             <p className="text-xs text-gray-400">
               <span className="mr-1 text-gray-500">•</span>
-              {highlightText(e.description)}
+              {e.value ? <>{highlightText(e.value)}%</> : null}
             </p>
           </div>
         ))}
