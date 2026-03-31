@@ -5,7 +5,7 @@ type HistoryMessage = {
   keywords?: string[];
 };
 
-export const triggerUpdate = async (characterName: string): Promise<void> => {
+export const triggerUpdate = async (characterName: string): Promise<string> => {
   const res = await fetch(
     `${process.env.NEXT_PUBLIC_API_BASE_URL}/trigger-update`,
     {
@@ -15,6 +15,44 @@ export const triggerUpdate = async (characterName: string): Promise<void> => {
     },
   );
   if (!res.ok) throw new Error(await res.text());
+  const data = await res.json();
+  return data.run_id as string;
+};
+
+export const pollDagStatus = async (
+  runId: string,
+  onStatus: (msg: string) => void,
+  intervalMs = 5000,
+  timeoutMs = 300000,
+): Promise<'success' | 'failed'> => {
+  const start = Date.now();
+  return new Promise((resolve, reject) => {
+    const check = async () => {
+      if (Date.now() - start > timeoutMs) {
+        reject(new Error('수집 대기 시간 초과'));
+        return;
+      }
+      try {
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_BASE_URL}/dag-status/${runId}`,
+        );
+        if (!res.ok) throw new Error(`status ${res.status}`);
+        const data = await res.json();
+        const status: string = data.status;
+        if (status === 'success') {
+          resolve('success');
+        } else if (status === 'failed') {
+          resolve('failed');
+        } else {
+          onStatus(`데이터 수집 중이에요... (${status})`);
+          setTimeout(check, intervalMs);
+        }
+      } catch {
+        setTimeout(check, intervalMs);
+      }
+    };
+    check();
+  });
 };
 
 export const askAIStream = async (
@@ -36,8 +74,8 @@ export const askAIStream = async (
         signal,
       },
     );
-    console.log(res);
-    const reader = res.body!.getReader();
+    if (!res.ok || !res.body) throw new Error(await res.text());
+    const reader = res.body.getReader();
     const decoder = new TextDecoder();
     let buffer = '';
 

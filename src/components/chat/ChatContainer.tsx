@@ -1,6 +1,6 @@
 'use client';
 
-import { askAIStream, triggerUpdate } from '@/lib/apis/askAI';
+import { askAIStream, pollDagStatus, triggerUpdate } from '@/lib/apis/askAI';
 import { useChatStore } from '@/store/chatStore';
 import { ChatMessage } from '@/types/chat';
 import { IconMessageChatbotFilled } from '@tabler/icons-react';
@@ -26,6 +26,7 @@ export default function ChatContainer() {
   const [inputValue, setInputValue] = useState('');
   const [statusText, setStatusText] = useState('');
   const pendingNicknameRef = useRef<string | null>(null);
+  const pendingQuestionRef = useRef<string | null>(null);
 
   // 봇 메시지 업데이트
   const updateBotMsg = (id: string, update: Partial<ChatMessage>) =>
@@ -45,7 +46,9 @@ export default function ChatContainer() {
     // 수집 대기 중인 캐릭터가 있고 긍정 응답이면 trigger-update 호출
     if (pendingNicknameRef.current && question.trim() === '예') {
       const nickname = pendingNicknameRef.current;
+      const originalQuestion = pendingQuestionRef.current;
       pendingNicknameRef.current = null;
+      pendingQuestionRef.current = null;
       const userMsgId = `${Date.now()}-user`;
       const botMsgId = `${Date.now()}-bot`;
       setMessages((prev) => [
@@ -54,14 +57,22 @@ export default function ChatContainer() {
         { id: botMsgId, role: 'bot', content: '' },
       ]);
       try {
-        await triggerUpdate(nickname);
-        updateBotMsg(botMsgId, {
-          content: `${nickname} 데이터 수집을 시작했어요! 잠시 후 다시 질문해 주세요.`,
-        });
+        const runId = await triggerUpdate(nickname);
+        updateBotMsg(botMsgId, { content: `${nickname} 데이터를 수집하는 중이에요...` });
+        setStreamingId(botMsgId);
+        const result = await pollDagStatus(runId, (msg) =>
+          updateBotMsg(botMsgId, { content: msg }),
+        );
+        setStreamingId(null);
+        if (result === 'success' && originalQuestion) {
+          updateBotMsg(botMsgId, { content: '수집 완료! 바로 답변을 가져올게요.' });
+          await handleSend(originalQuestion);
+        } else if (result === 'failed') {
+          updateBotMsg(botMsgId, { content: `${nickname} 데이터 수집에 실패했어요. 다시 시도해 주세요.` });
+        }
       } catch {
-        updateBotMsg(botMsgId, {
-          content: '수집 요청에 실패했습니다. 잠시 후 다시 시도해 주세요.',
-        });
+        setStreamingId(null);
+        updateBotMsg(botMsgId, { content: '수집 요청에 실패했습니다. 잠시 후 다시 시도해 주세요.' });
       }
       setInputValue('');
       return;
@@ -117,6 +128,7 @@ export default function ChatContainer() {
 
     const onConfirmCollect = (nickname: string) => {
       pendingNicknameRef.current = nickname;
+      pendingQuestionRef.current = question;
     };
 
     const onStatus = (status: string) => {

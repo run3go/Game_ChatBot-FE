@@ -1,17 +1,23 @@
 export interface ArkPassiveEffectItem {
   character_name: string;
   name: ArkPassiveName;
-  icon: string;
-  tier: '1티어' | '2티어' | '3티어' | '4티어' | '5티어' | string;
+  collected_at: string;
+  icon: string | null;
+  tier: string | null;
   effect_name: string;
-  level: number;
+  level: number | null;
+  level_effect: string | null;
+  req_points: string | null;
+  max_level: string | null;
 }
 
 export interface ArkPassivePointItem {
   character_name: string;
   name: ArkPassiveName;
+  collected_at: string;
   value: number;
-  description: string;
+  point_rank: number | null;
+  point_level: number | null;
 }
 
 export type ArkPassiveName = '진화' | '깨달음' | '도약';
