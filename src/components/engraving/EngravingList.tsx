@@ -8,7 +8,9 @@ import { useState } from 'react';
 
 export default function EngravingList({ data }: { data: EngravingData }) {
   const engravings = data.armory_engravings_tb;
-  const [selected, setSelected] = useState<ArmoryEngraving>(engravings[0]);
+  const [selected, setSelected] = useState<ArmoryEngraving | undefined>(engravings[0]);
+
+  if (!selected) return null;
 
   return (
     <div className="flex gap-3">
@@ -26,9 +28,9 @@ export default function EngravingList({ data }: { data: EngravingData }) {
               onClick={() => setSelected(engraving)}
             >
               <div className="shrink-0">
-                {engraving.icon ? (
+                {engraving.icon_url ? (
                   <Image
-                    src={engraving.icon}
+                    src={engraving.icon_url}
                     alt={engraving.name}
                     width={40}
                     height={40}

@@ -18,8 +18,9 @@ const SLOT_ORDER = [
 const FACE_TYPES = ['얼굴1 아바타', '얼굴2 아바타'];
 
 export default function AvatarList({ data }: { data: AvatarData }) {
-  const avatars = data.armory_avatars_tb;
-  const profile = data.armory_profile_tb[0];
+  const avatars = data.armory_avatars_tb ?? [];
+  const profile = data.armory_profile_tb?.[0];
+  if (!profile) return null;
 
   const sorted = [...avatars].sort(
     (a, b) => SLOT_ORDER.indexOf(a.type) - SLOT_ORDER.indexOf(b.type),

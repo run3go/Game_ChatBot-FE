@@ -33,9 +33,11 @@ const ICON_IMAGE: Record<string, StaticImageData> = {
 
 export default function Collectible({ data }: { data: CollectibleData }) {
   const { armory_collectibles_tb, armory_collectible_details_tb } = data;
-  const [selected, setSelected] = useState<ArmoryCollectible>(
+  const [selected, setSelected] = useState<ArmoryCollectible | undefined>(
     armory_collectibles_tb[0],
   );
+
+  if (!selected) return null;
 
   const details = armory_collectible_details_tb.filter(
     (d) => d.type === selected.type,

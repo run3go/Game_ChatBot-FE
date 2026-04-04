@@ -3,7 +3,7 @@
 import { askAIStream, pollDagStatus, triggerUpdate } from '@/lib/apis/askAI';
 import { useChatStore } from '@/store/chatStore';
 import { ChatMessage } from '@/types/chat';
-import { IconMessageChatbotFilled } from '@tabler/icons-react';
+import { IconChevronDown, IconMessageChatbotFilled } from '@tabler/icons-react';
 import { useEffect, useRef, useState } from 'react';
 import ChatInput from './ChatInput';
 import TypingText from './TypingText';
@@ -25,6 +25,7 @@ export default function ChatContainer() {
   const [streamingId, setStreamingId] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState('');
   const [statusText, setStatusText] = useState('');
+  const [isAtBottom, setIsAtBottom] = useState(true);
   const pendingNicknameRef = useRef<string | null>(null);
   const pendingQuestionRef = useRef<string | null>(null);
 
@@ -58,21 +59,29 @@ export default function ChatContainer() {
       ]);
       try {
         const runId = await triggerUpdate(nickname);
-        updateBotMsg(botMsgId, { content: `${nickname} 데이터를 수집하는 중이에요...` });
+        updateBotMsg(botMsgId, {
+          content: `${nickname} 데이터를 수집하는 중이에요...`,
+        });
         setStreamingId(botMsgId);
         const result = await pollDagStatus(runId, (msg) =>
           updateBotMsg(botMsgId, { content: msg }),
         );
         setStreamingId(null);
         if (result === 'success' && originalQuestion) {
-          updateBotMsg(botMsgId, { content: '수집 완료! 바로 답변을 가져올게요.' });
+          updateBotMsg(botMsgId, {
+            content: '수집 완료! 바로 답변을 가져올게요.',
+          });
           await handleSend(originalQuestion);
         } else if (result === 'failed') {
-          updateBotMsg(botMsgId, { content: `${nickname} 데이터 수집에 실패했어요. 다시 시도해 주세요.` });
+          updateBotMsg(botMsgId, {
+            content: `${nickname} 데이터 수집에 실패했어요. 다시 시도해 주세요.`,
+          });
         }
       } catch {
         setStreamingId(null);
-        updateBotMsg(botMsgId, { content: '수집 요청에 실패했습니다. 잠시 후 다시 시도해 주세요.' });
+        updateBotMsg(botMsgId, {
+          content: '수집 요청에 실패했습니다. 잠시 후 다시 시도해 주세요.',
+        });
       }
       setInputValue('');
       return;
@@ -197,13 +206,38 @@ export default function ChatContainer() {
     container.scrollTo({ top: pair.offsetTop, behavior: 'smooth' });
   }, [lastUserMsgId]);
 
+  const checkIsAtBottom = () => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    const { scrollTop, scrollHeight, clientHeight } = container;
+    setIsAtBottom(scrollHeight - scrollTop - clientHeight < 40);
+  };
+
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+    container.addEventListener('scroll', checkIsAtBottom);
+    return () => container.removeEventListener('scroll', checkIsAtBottom);
+  }, []);
+
+  useEffect(() => {
+    checkIsAtBottom();
+  }, [messages]);
+
+  const scrollToBottom = () => {
+    scrollContainerRef.current?.scrollTo({
+      top: scrollContainerRef.current.scrollHeight,
+      behavior: 'smooth',
+    });
+  };
+
   const pairs: { user: ChatMessage; bot?: ChatMessage }[] = [];
   for (let i = 0; i < messages.length; i += 2) {
     pairs.push({ user: messages[i], bot: messages[i + 1] });
   }
 
   return (
-    <div className="flex h-full w-full max-w-3xl flex-col">
+    <div className="relative flex h-full w-full max-w-3xl flex-col">
       <div
         ref={scrollContainerRef}
         className="scrollbar-hide flex-1 overflow-y-auto"
@@ -238,10 +272,12 @@ export default function ChatContainer() {
                     </div>
                   ) : (
                     <>
-                      <div className="pt-1">
-                        <TypingText content={bot.content} />
-                      </div>
                       <UIContainer result={bot.result} />
+                      {bot.content && (
+                        <div className="pt-1">
+                          <TypingText content={bot.content} />
+                        </div>
+                      )}
                     </>
                   )}
                 </div>
@@ -250,6 +286,15 @@ export default function ChatContainer() {
           </div>
         ))}
       </div>
+
+      {!isAtBottom && (
+        <button
+          onClick={scrollToBottom}
+          className="animate-bounce-subtle absolute bottom-25 left-1/2 z-10 cursor-pointer rounded-full bg-linear-to-r from-indigo-500 to-violet-500 p-2 shadow-md transition hover:opacity-90"
+        >
+          <IconChevronDown size={18} className="text-white" />
+        </button>
+      )}
 
       <div className="shrink-0 border-t border-gray-100 bg-gray-50 px-4 py-4">
         <ChatInput

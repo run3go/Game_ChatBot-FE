@@ -8,8 +8,10 @@ import GemsSection from './GemsSection';
 import StatsSection from './StatsSection';
 
 export default function Profile({ data }: { data: ProfileData }) {
-  const profile = data.armory_profile_tb[0];
-  const gemEffect = data.armory_gem_effects_tb[0];
+  const profile = data.armory_profile_tb?.[0];
+  const gemEffect = data.armory_gem_effects_tb?.[0];
+
+  if (!profile) return null;
 
   return (
     <div className="flex flex-col gap-3">

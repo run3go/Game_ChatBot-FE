@@ -2,8 +2,8 @@ import { SkillData } from '@/types/skill';
 import SkillRow from './SkillRow';
 
 export default function SkillList({ data }: { data: SkillData }) {
-  const skills = data.armory_skills_tb;
-  const gems = data.armory_gem_tb;
+  const skills = data.armory_skills_tb ?? [];
+  const gems = data.armory_gem_tb ?? [];
   return (
     <div className="flex flex-col gap-4">
       {/* 스킬 목록 */}

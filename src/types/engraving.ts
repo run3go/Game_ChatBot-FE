@@ -7,7 +7,13 @@ export interface ArmoryEngraving {
   level: number;
   ability_stone_level: number | null;
   description: string;
-  icon?: string;
+  icon_url?: string | null;
+  legend_final?: string | null;
+  relic_final?: string | null;
+  basic_effect?: string | null;
+  legend_effect?: string | null;
+  relic_effect?: string | null;
+  stone_effect?: string | null;
 }
 
 export interface EngravingData {

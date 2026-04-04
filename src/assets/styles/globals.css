@@ -18,7 +18,15 @@
   --color-surface-dark: #3d3d3d;
 }
 
+@keyframes bounce-subtle {
+  0%, 100% { transform: translateY(0) translateX(-50%); }
+  50% { transform: translateY(-4px) translateX(-50%); }
+}
+
 @layer utilities {
+  .animate-bounce-subtle {
+    animation: bounce-subtle 1.6s ease-in-out infinite;
+  }
   .scrollbar-hide {
     &::-webkit-scrollbar {
       display: none;
