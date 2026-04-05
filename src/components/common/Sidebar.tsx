@@ -16,20 +16,8 @@ export default function Sidebar() {
   const [chatList, setChatList] = useState<ChatType[]>([]);
   const [justTitledChatId, setJustTitledChatId] = useState<string | null>(null);
 
-  const { pendingTitleUpdate, setPendingTitleUpdate } = useChatStore();
-
-  useEffect(() => {
-    if (!pendingTitleUpdate) return;
-    setChatList((prev) =>
-      prev.map((c) =>
-        c.chat_id === pendingTitleUpdate.chatId
-          ? { ...c, title: pendingTitleUpdate.title }
-          : c,
-      ),
-    );
-    setJustTitledChatId(pendingTitleUpdate.chatId);
-    setPendingTitleUpdate(null);
-  }, [pendingTitleUpdate, setPendingTitleUpdate]);
+  const { pendingTitleUpdate, setPendingTitleUpdate, chatListRefreshKey } =
+    useChatStore();
 
   const fetchSessions = useCallback(async () => {
     const sessions = await getChatSessions();
@@ -44,17 +32,39 @@ export default function Sidebar() {
     await deleteChatSession(id).catch(() => {});
   };
 
+  // 세션에서 최초 질문 시, 타이틀 업데이트
   useEffect(() => {
-    fetchSessions();
-  }, [fetchSessions]);
+    if (!pendingTitleUpdate) return;
+    setChatList((prev) =>
+      prev.map((c) =>
+        c.chat_id === pendingTitleUpdate.chatId
+          ? { ...c, title: pendingTitleUpdate.title }
+          : c,
+      ),
+    );
+    setJustTitledChatId(pendingTitleUpdate.chatId);
+    setPendingTitleUpdate(null);
+  }, [pendingTitleUpdate, setPendingTitleUpdate]);
+
+  // 질문을 할 때마다 해당 채팅을 최상단으로 이동
+  useEffect(() => {
+    if (chatListRefreshKey === 0 || !chatId) return;
+    setChatList((prev) => {
+      const idx = prev.findIndex((c) => c.chat_id === chatId);
+      if (idx <= 0) return prev;
+      return [prev[idx], ...prev.slice(0, idx), ...prev.slice(idx + 1)];
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatListRefreshKey]);
 
   // 홈에서 새 세션 생성 후 목록에 없으면 re-fetch
   useEffect(() => {
-    if (chatId && !chatList.some((c) => c.chat_id === chatId)) {
+    if (!chatList.some((c) => c.chat_id === chatId)) {
       fetchSessions();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatId, fetchSessions]);
+
   return (
     <div className="flex h-full w-80 flex-col border-r border-gray-200">
       <div className="h-20 border-b border-gray-200 p-4">

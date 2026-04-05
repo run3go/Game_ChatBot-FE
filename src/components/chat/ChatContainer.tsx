@@ -16,7 +16,7 @@ const CONFIRM_COLLECT_ANSWER = '예';
 
 export default function ChatContainer() {
   const { id: chatId } = useParams<{ id: string }>();
-  const { messages, setMessages, pendingMessage, setPendingMessage, setPendingTitleUpdate, setIsLoadingTitle } =
+  const { messages, setMessages, pendingMessage, setPendingMessage, setPendingTitleUpdate, setIsLoadingTitle, refreshChatList } =
     useChatStore();
 
   const [streamingId, setStreamingId] = useState<string | null>(null);
@@ -152,6 +152,7 @@ export default function ChatContainer() {
     ]);
 
     let botContent = '';
+    refreshChatList();
     try {
       await askAIStream(
         question,
