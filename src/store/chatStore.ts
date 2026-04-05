@@ -3,34 +3,28 @@ import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
 
 interface ChatStore {
-  chatId: string | null;
   pendingMessage: string | null;
   messages: ChatMessage[];
-  history: { role: 'user' | 'assistant'; content: string; nicknames?: string[]; keywords?: string[] }[];
-  setChatId: (id: string) => void;
+  pendingTitleUpdate: { chatId: string; title: string } | null;
+  isLoadingTitle: boolean;
   setPendingMessage: (msg: string | null) => void;
   setMessages: (updater: (prev: ChatMessage[]) => ChatMessage[]) => void;
-  setHistory: (
-    updater: (
-      prev: { role: 'user' | 'assistant'; content: string; nicknames?: string[]; keywords?: string[] }[],
-    ) => { role: 'user' | 'assistant'; content: string; nicknames?: string[]; keywords?: string[] }[],
-  ) => void;
   resetChat: () => void;
+  setPendingTitleUpdate: (update: { chatId: string; title: string } | null) => void;
+  setIsLoadingTitle: (loading: boolean) => void;
 }
 
 export const useChatStore = create<ChatStore>()(
   devtools((set) => ({
-    chatId: null,
     pendingMessage: null,
     messages: [],
-    history: [],
-    setChatId: (id) => set({ chatId: id }),
+    pendingTitleUpdate: null,
+    isLoadingTitle: false,
     setPendingMessage: (msg) => set({ pendingMessage: msg }),
     setMessages: (updater) =>
       set((state) => ({ messages: updater(state.messages) })),
-    setHistory: (updater) =>
-      set((state) => ({ history: updater(state.history) })),
-    resetChat: () =>
-      set({ chatId: null, pendingMessage: null, messages: [], history: [] }),
+    resetChat: () => set({ pendingMessage: null, messages: [] }),
+    setPendingTitleUpdate: (update) => set({ pendingTitleUpdate: update }),
+    setIsLoadingTitle: (loading) => set({ isLoadingTitle: loading }),
   })),
 );

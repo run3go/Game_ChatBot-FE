@@ -1,9 +1,13 @@
-type HistoryMessage = {
-  role: 'user' | 'assistant';
-  content: string;
-  nicknames?: string[];
-  keywords?: string[];
-};
+import { UIResult } from '@/components/chat/UIContainer';
+import { getUserId } from '../userId';
+
+export interface AskAIStreamCallbacks {
+  onChunk: (chunk: string) => void;
+  onStructured: (payload: UIResult) => void;
+  onConfirmCollect: (nickname: string) => void;
+  onStatus: (status: string) => void;
+  onTitle: (title: string) => void;
+}
 
 export const triggerUpdate = async (characterName: string): Promise<string> => {
   const res = await fetch(
@@ -57,20 +61,22 @@ export const pollDagStatus = async (
 
 export const askAIStream = async (
   question: string,
-  history: HistoryMessage[],
-  onChunk: (chunk: string) => void,
-  onStructured: (payload: unknown) => void,
-  onConfirmCollect: (nickname: string) => void,
-  onStatus: (status: string) => void,
+  chatId: string,
+  callbacks: AskAIStreamCallbacks,
   signal?: AbortSignal,
 ) => {
+  const { onChunk, onStructured, onConfirmCollect, onStatus, onTitle } = callbacks;
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/ask/stream`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question, history }),
+        body: JSON.stringify({
+          question,
+          chat_id: chatId,
+          user_id: getUserId(),
+        }),
         signal,
       },
     );
@@ -101,6 +107,8 @@ export const askAIStream = async (
           onConfirmCollect(parsed.nickname);
         } else if (parsed.type === 'status') {
           onStatus(parsed.content);
+        } else if (parsed.type === 'title') {
+          onTitle(parsed.content);
         }
       }
     }

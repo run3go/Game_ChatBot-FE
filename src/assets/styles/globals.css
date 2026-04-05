@@ -23,9 +23,27 @@
   50% { transform: translateY(-4px) translateX(-50%); }
 }
 
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+@keyframes title-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
 @layer utilities {
   .animate-bounce-subtle {
     animation: bounce-subtle 1.6s ease-in-out infinite;
+  }
+  .animate-shimmer {
+    background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+    background-size: 800px 100%;
+    animation: shimmer 1.4s ease-in-out infinite;
+  }
+  .animate-title-in {
+    animation: title-in 0.25s ease-out both;
   }
   .scrollbar-hide {
     &::-webkit-scrollbar {

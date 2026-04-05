@@ -1,55 +1,95 @@
 'use client';
 
+import { useChatScroll } from '@/hooks/useChatScroll';
 import { askAIStream, pollDagStatus, triggerUpdate } from '@/lib/apis/askAI';
+import { UIResult } from '@/components/chat/UIContainer';
+import { deleteChatSession, getChatMessages } from '@/lib/apis/user';
 import { useChatStore } from '@/store/chatStore';
 import { ChatMessage } from '@/types/chat';
-import { IconChevronDown, IconMessageChatbotFilled } from '@tabler/icons-react';
+import { IconChevronDown } from '@tabler/icons-react';
+import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import ChatInput from './ChatInput';
-import TypingText from './TypingText';
-import UIContainer from './UIContainer';
+import MessagePair from './MessagePair';
 
 export default function ChatContainer() {
-  const {
-    messages,
-    history,
-    setMessages,
-    setHistory,
-    pendingMessage,
-    setPendingMessage,
-  } = useChatStore();
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const lastPairRef = useRef<HTMLDivElement>(null);
-  const abortControllerRef = useRef<AbortController | null>(null);
-  const [lastUserMsgId, setLastUserMsgId] = useState<string | null>(null);
+  const { id: chatId } = useParams<{ id: string }>();
+  const { messages, setMessages, pendingMessage, setPendingMessage, setPendingTitleUpdate, setIsLoadingTitle } =
+    useChatStore();
+
   const [streamingId, setStreamingId] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState('');
   const [statusText, setStatusText] = useState('');
-  const [isAtBottom, setIsAtBottom] = useState(true);
-  const pendingNicknameRef = useRef<string | null>(null);
-  const pendingQuestionRef = useRef<string | null>(null);
+  const {
+    scrollContainerRef,
+    lastPairRef,
+    isAtBottom,
+    scrollToBottom,
+    setLastUserMsgId,
+  } = useChatScroll(messages);
 
-  // 봇 메시지 업데이트
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const pendingCollectRef = useRef<{
+    nickname: string;
+    question: string;
+  } | null>(null);
+  const sessionRef = useRef({ isNew: false, hasSent: false });
+
+  // 새 세션이고 아무것도 전송하지 않은 채 이탈하면 세션 삭제
+  useEffect(() => {
+    const s = sessionRef;
+    return () => {
+      if (s.current.isNew && !s.current.hasSent) {
+        deleteChatSession(chatId).catch(() => {});
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 마운트 시: 새 메시지 전송 or 기존 히스토리 로드
+  useEffect(() => {
+    if (pendingMessage) {
+      sessionRef.current.isNew = true;
+      setMessages(() => []);
+      setPendingMessage(null);
+      handleSend(pendingMessage);
+    } else {
+      getChatMessages(chatId)
+        .then((history) => {
+          if (!history.length) return;
+          setMessages(() =>
+            history.map((m, i) => ({
+              id: `${i}-${m.role}`,
+              role:
+                m.role === 'assistant' ? ('bot' as const) : ('user' as const),
+              content: m.content,
+              ...(m.result_json ? { result: m.result_json as UIResult } : {}),
+            })),
+          );
+        })
+        .catch(() => {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const updateBotMsg = (id: string, update: Partial<ChatMessage>) =>
     setMessages((prev) =>
       prev.map((msg) => (msg.id === id ? { ...msg, ...update } : msg)),
     );
 
-  const handleCancel = () => {
-    abortControllerRef.current?.abort();
-  };
+  const handleCancel = () => abortControllerRef.current?.abort();
 
-  // 사용자 질문 전송 및 답변 반환
   const handleSend = async (text?: string) => {
     const question = text ?? inputValue;
     if (!question.trim()) return;
+    sessionRef.current.hasSent = true;
 
-    // 수집 대기 중인 캐릭터가 있고 긍정 응답이면 trigger-update 호출
-    if (pendingNicknameRef.current && question.trim() === '예') {
-      const nickname = pendingNicknameRef.current;
-      const originalQuestion = pendingQuestionRef.current;
-      pendingNicknameRef.current = null;
-      pendingQuestionRef.current = null;
+    // 데이터 수집 확인 응답 처리
+    if (pendingCollectRef.current && question.trim() === '예') {
+      const { nickname, question: originalQuestion } =
+        pendingCollectRef.current;
+      pendingCollectRef.current = null;
+
       const userMsgId = `${Date.now()}-user`;
       const botMsgId = `${Date.now()}-bot`;
       setMessages((prev) => [
@@ -57,6 +97,7 @@ export default function ChatContainer() {
         { id: userMsgId, role: 'user', content: question },
         { id: botMsgId, role: 'bot', content: '' },
       ]);
+
       try {
         const runId = await triggerUpdate(nickname);
         updateBotMsg(botMsgId, {
@@ -87,11 +128,10 @@ export default function ChatContainer() {
       return;
     }
 
-    pendingNicknameRef.current = null;
+    pendingCollectRef.current = null;
 
     const userMsgId = `${Date.now()}-user`;
     const botMsgId = `${Date.now()}-bot`;
-
     const controller = new AbortController();
     abortControllerRef.current = controller;
     let timedOut = false;
@@ -100,6 +140,7 @@ export default function ChatContainer() {
       controller.abort();
     }, 30000);
 
+    if (sessionRef.current.isNew) setIsLoadingTitle(true);
     setLastUserMsgId(userMsgId);
     setStreamingId(botMsgId);
     setMessages((prev) => [
@@ -109,66 +150,29 @@ export default function ChatContainer() {
     ]);
 
     let botContent = '';
-    let botStructuredLabel = '';
-    let userMsgNicknames: string[] | undefined;
-    let userMsgKeywords: string[] | undefined;
-
-    const onChunk = (chunk: string) => {
-      botContent += chunk;
-      updateBotMsg(botMsgId, { content: botContent });
-    };
-
-    const onStructured = (payload: unknown) => {
-      const p = payload as {
-        ui_type: string;
-        nickname?: string;
-        nicknames?: string[];
-        keywords?: string[];
-      };
-
-      if (p.nicknames?.length) userMsgNicknames = p.nicknames;
-      if (p.keywords?.length) userMsgKeywords = p.keywords;
-
-      botStructuredLabel = p.nickname
-        ? `[${p.nickname}의 ${p.ui_type} 데이터 표시]`
-        : `[${p.ui_type} 데이터 표시]`;
-      updateBotMsg(botMsgId, { content: '', result: payload as never });
-    };
-
-    const onConfirmCollect = (nickname: string) => {
-      pendingNicknameRef.current = nickname;
-      pendingQuestionRef.current = question;
-    };
-
-    const onStatus = (status: string) => {
-      setStatusText(status);
-    };
-
     try {
       await askAIStream(
         question,
-        history,
-        onChunk,
-        onStructured,
-        onConfirmCollect,
-        onStatus,
+        chatId,
+        {
+          onChunk: (chunk) => {
+            botContent += chunk;
+            updateBotMsg(botMsgId, { content: botContent });
+          },
+          onStructured: (payload) => {
+            updateBotMsg(botMsgId, { content: '', result: payload });
+          },
+          onConfirmCollect: (nickname) => {
+            pendingCollectRef.current = { nickname, question };
+          },
+          onStatus: (status) => {
+            setStatusText(status);
+          },
+          onTitle: (title) => {
+            setPendingTitleUpdate({ chatId, title });
+          },
+        },
         controller.signal,
-      );
-
-      setHistory((prev) =>
-        [
-          ...prev,
-          {
-            role: 'user' as const,
-            content: question,
-            ...(userMsgNicknames && { nicknames: userMsgNicknames }),
-            ...(userMsgKeywords && { keywords: userMsgKeywords }),
-          },
-          {
-            role: 'assistant' as const,
-            content: botContent || botStructuredLabel,
-          },
-        ].slice(-10),
       );
     } catch {
       if (timedOut) {
@@ -185,50 +189,10 @@ export default function ChatContainer() {
       const aborted = controller.signal.aborted;
       setStreamingId(null);
       setStatusText('');
+      setIsLoadingTitle(false);
       if (!aborted) setInputValue('');
       abortControllerRef.current = null;
     }
-  };
-
-  // 홈에서 넘어온 첫 메시지 자동 전송
-  useEffect(() => {
-    if (pendingMessage) {
-      setPendingMessage(null);
-      handleSend(pendingMessage);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    const pair = lastPairRef.current;
-    if (!container || !pair) return;
-    container.scrollTo({ top: pair.offsetTop, behavior: 'smooth' });
-  }, [lastUserMsgId]);
-
-  const checkIsAtBottom = () => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-    const { scrollTop, scrollHeight, clientHeight } = container;
-    setIsAtBottom(scrollHeight - scrollTop - clientHeight < 40);
-  };
-
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-    container.addEventListener('scroll', checkIsAtBottom);
-    return () => container.removeEventListener('scroll', checkIsAtBottom);
-  }, []);
-
-  useEffect(() => {
-    checkIsAtBottom();
-  }, [messages]);
-
-  const scrollToBottom = () => {
-    scrollContainerRef.current?.scrollTo({
-      top: scrollContainerRef.current.scrollHeight,
-      behavior: 'smooth',
-    });
   };
 
   const pairs: { user: ChatMessage; bot?: ChatMessage }[] = [];
@@ -243,47 +207,15 @@ export default function ChatContainer() {
         className="scrollbar-hide flex-1 overflow-y-auto"
       >
         {pairs.map(({ user, bot }, idx) => (
-          <div
+          <MessagePair
             key={user.id}
-            ref={idx === pairs.length - 1 ? lastPairRef : null}
-            className={`flex flex-col px-6 py-6 ${idx === pairs.length - 1 ? 'min-h-full' : ''}`}
-          >
-            <div className="flex justify-end">
-              <div className="max-w-[75%] rounded-2xl bg-linear-to-r from-indigo-500 to-violet-500 px-4 py-2.5 text-sm font-medium whitespace-pre-wrap text-white shadow-sm">
-                {user.content}
-              </div>
-            </div>
-
-            {bot && (
-              <div className="mt-6 flex items-start">
-                <div
-                  className={`grid size-8 shrink-0 place-items-center rounded-xl bg-linear-to-r from-indigo-500 to-violet-500 shadow-sm ${streamingId === bot.id ? 'animate-pulse' : ''}`}
-                >
-                  <IconMessageChatbotFilled size={18} color="white" />
-                </div>
-                <div className="w-full pb-1.5">
-                  {streamingId === bot.id && bot.content === '' ? (
-                    <div className="pt-1">
-                      <TypingText
-                        key={statusText}
-                        content={statusText}
-                        speed={30}
-                      />
-                    </div>
-                  ) : (
-                    <>
-                      <UIContainer result={bot.result} />
-                      {bot.content && (
-                        <div className="pt-1">
-                          <TypingText content={bot.content} />
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
+            user={user}
+            bot={bot}
+            isLast={idx === pairs.length - 1}
+            streamingId={streamingId}
+            statusText={statusText}
+            pairRef={idx === pairs.length - 1 ? lastPairRef : undefined}
+          />
         ))}
       </div>
 
