@@ -2,8 +2,8 @@
 
 import ChatInput from '@/components/chat/ChatInput';
 import Home from '@/components/home/Home';
-import { initUserId } from '@/lib/userId';
 import { createChatSession } from '@/lib/apis/user';
+import { initUserId } from '@/lib/userId';
 import { useChatStore } from '@/store/chatStore';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';

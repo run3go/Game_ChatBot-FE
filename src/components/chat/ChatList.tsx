@@ -1,10 +1,10 @@
 'use client';
 
 import { useChatStore } from '@/store/chatStore';
+import { ChatType } from '@/types/chat';
 import { IconX } from '@tabler/icons-react';
 import { useParams, useRouter } from 'next/navigation';
 import { twMerge } from 'tailwind-merge';
-import { ChatType } from '../common/Sidebar';
 
 interface ChatListProps {
   list: ChatType[];
@@ -13,7 +13,12 @@ interface ChatListProps {
   onTitleAnimationEnd: () => void;
 }
 
-export default function ChatList({ list, onDelete, justTitledChatId, onTitleAnimationEnd }: ChatListProps) {
+export default function ChatList({
+  list,
+  onDelete,
+  justTitledChatId,
+  onTitleAnimationEnd,
+}: ChatListProps) {
   const router = useRouter();
   const { id: currentChatId } = useParams();
   const isLoadingTitle = useChatStore((state) => state.isLoadingTitle);
@@ -25,7 +30,7 @@ export default function ChatList({ list, onDelete, justTitledChatId, onTitleAnim
         return isSkeleton ? (
           <li
             key={item.chat_id}
-            className="animate-shimmer rounded-lg border-l-4 border-primary-500 p-3"
+            className="animate-shimmer border-primary-500 rounded-lg border-l-4 p-3"
           >
             <div className="h-5" />
           </li>
@@ -40,7 +45,6 @@ export default function ChatList({ list, onDelete, justTitledChatId, onTitleAnim
             onClick={() => router.push(`/chat/${item.chat_id}`)}
           >
             <h3
-              key={item.title}
               className={twMerge(
                 'truncate text-sm font-medium text-gray-800',
                 item.chat_id === justTitledChatId && 'animate-title-in',

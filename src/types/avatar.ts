@@ -1,3 +1,5 @@
+import { ArmoryProfile } from './profile';
+
 export type AvatarGrade = '고급' | '희귀' | '영웅' | '전설' | '유물' | '고대';
 
 export type AvatarSlotType =
@@ -20,38 +22,6 @@ export interface ArmoryAvatar {
   basic_effect: string | null;
   tendency_stat: string | null;
   source: string | null;
-}
-
-export interface ArmoryProfile {
-  character_name: string;
-  server_name: string;
-  character_class_name: string;
-  character_level: number;
-  item_avg_level: number;
-  combat_power: number;
-  character_image: string;
-  expedition_level: number;
-  town_level: number;
-  town_name: string;
-  title: string | null;
-  guild_member_grade: string | null;
-  guild_name: string | null;
-  using_skill_point: number;
-  total_skill_point: number;
-  honor_point: number;
-  stat_atk: number;
-  stat_hp: number;
-  stat_crit: number;
-  stat_spec: number;
-  stat_swift: number;
-  stat_dom: number;
-  stat_end: number;
-  stat_exp: number;
-  tend_intellect: number;
-  tend_courage: number;
-  tend_charm: number;
-  tend_kindness: number;
-  updated_at: string;
 }
 
 export interface AvatarData {

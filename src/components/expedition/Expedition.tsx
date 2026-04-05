@@ -1,4 +1,4 @@
-import { ExpeditionData } from '@/types/expedition';
+import { ExpeditionCharacter, ExpeditionData } from '@/types/expedition';
 import { useState } from 'react';
 
 export default function Expedition({ data }: { data: ExpeditionData }) {
@@ -9,7 +9,7 @@ export default function Expedition({ data }: { data: ExpeditionData }) {
     y: number;
   } | null>(null);
 
-  const grouped = characters.reduce<Record<string, typeof characters>>(
+  const grouped = characters.reduce<Record<string, ExpeditionCharacter[]>>(
     (acc, char) => {
       if (!acc[char.ServerName]) acc[char.ServerName] = [];
       acc[char.ServerName].push(char);

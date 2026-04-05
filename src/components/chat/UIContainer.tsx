@@ -35,7 +35,7 @@ type UIResult =
   | TotalInfoResult
   | ConfirmCollectResult;
 
-export type { UIResult, ConfirmCollectResult };
+export type { ConfirmCollectResult, UIResult };
 
 export default function UIContainer({
   result,
@@ -44,13 +44,11 @@ export default function UIContainer({
   result?: UIResult;
   onConfirmCollect?: (nickname: string) => void;
 }) {
-  console.log(result);
   if (!result) return null;
-  const { ui_type } = result;
   return (
     <div className="pb-4 pl-4">
       {(() => {
-        switch (ui_type) {
+        switch (result.ui_type) {
           case 'CONFIRM_COLLECT':
             return (
               <div className="flex flex-col gap-3">
@@ -64,23 +62,23 @@ export default function UIContainer({
               </div>
             );
           case 'SKILL':
-            return <SkillList data={(result as SkillResult).data} />;
+            return <SkillList data={result.data} />;
           case 'ARK_GRID':
-            return <ArkGrid data={(result as ArkGridResult).data} />;
+            return <ArkGrid data={result.data} />;
           case 'ARK_PASSIVE':
-            return <ArkPassive data={(result as ArkPassiveResult).data} />;
+            return <ArkPassive data={result.data} />;
           case 'COLLECTIBLE':
-            return <Collectible data={(result as CollectibleResult).data} />;
+            return <Collectible data={result.data} />;
           case 'ENGRAVING':
-            return <EngravingList data={(result as EngravingResult).data} />;
+            return <EngravingList data={result.data} />;
           case 'EXPEDITION':
-            return <Expedition data={(result as ExpeditionResult).data} />;
+            return <Expedition data={result.data} />;
           case 'AVATAR':
-            return <AvatarList data={(result as AvatarResult).data} />;
+            return <AvatarList data={result.data} />;
           case 'PROFILE':
-            return <Profile data={(result as ProfileResult).data} />;
+            return <Profile data={result.data} />;
           case 'TOTAL_INFO':
-            return <TotalInfo data={(result as TotalInfoResult).data} />;
+            return <TotalInfo data={result.data} />;
           default:
             return null;
         }

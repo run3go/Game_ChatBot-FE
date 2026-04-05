@@ -2,16 +2,12 @@
 
 import { deleteChatSession, getChatSessions } from '@/lib/apis/user';
 import { useChatStore } from '@/store/chatStore';
+import { ChatType } from '@/types/chat';
 import { IconPlus } from '@tabler/icons-react';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import ChatList from '../chat/ChatList';
-
-export interface ChatType {
-  title: string | null;
-  chat_id: string;
-}
 
 export default function Sidebar() {
   const { id: chatId } = useParams();
@@ -35,10 +31,10 @@ export default function Sidebar() {
     setPendingTitleUpdate(null);
   }, [pendingTitleUpdate, setPendingTitleUpdate]);
 
-  const fetchSessions = async () => {
+  const fetchSessions = useCallback(async () => {
     const sessions = await getChatSessions();
     setChatList(sessions.map((s) => ({ title: s.title, chat_id: s.chat_id })));
-  };
+  }, []);
 
   const handleDelete = async (id: string) => {
     if (chatId === id) {
@@ -50,7 +46,7 @@ export default function Sidebar() {
 
   useEffect(() => {
     fetchSessions();
-  }, []);
+  }, [fetchSessions]);
 
   // 홈에서 새 세션 생성 후 목록에 없으면 re-fetch
   useEffect(() => {
@@ -58,7 +54,7 @@ export default function Sidebar() {
       fetchSessions();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chatId]);
+  }, [chatId, fetchSessions]);
   return (
     <div className="flex h-full w-80 flex-col border-r border-gray-200">
       <div className="h-20 border-b border-gray-200 p-4">

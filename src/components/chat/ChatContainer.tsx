@@ -8,9 +8,11 @@ import { useChatStore } from '@/store/chatStore';
 import { ChatMessage } from '@/types/chat';
 import { IconChevronDown } from '@tabler/icons-react';
 import { useParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import ChatInput from './ChatInput';
 import MessagePair from './MessagePair';
+
+const CONFIRM_COLLECT_ANSWER = '예';
 
 export default function ChatContainer() {
   const { id: chatId } = useParams<{ id: string }>();
@@ -85,7 +87,7 @@ export default function ChatContainer() {
     sessionRef.current.hasSent = true;
 
     // 데이터 수집 확인 응답 처리
-    if (pendingCollectRef.current && question.trim() === '예') {
+    if (pendingCollectRef.current && question.trim() === CONFIRM_COLLECT_ANSWER) {
       const { nickname, question: originalQuestion } =
         pendingCollectRef.current;
       pendingCollectRef.current = null;
@@ -195,10 +197,13 @@ export default function ChatContainer() {
     }
   };
 
-  const pairs: { user: ChatMessage; bot?: ChatMessage }[] = [];
-  for (let i = 0; i < messages.length; i += 2) {
-    pairs.push({ user: messages[i], bot: messages[i + 1] });
-  }
+  const pairs = useMemo(() => {
+    const result: { user: ChatMessage; bot?: ChatMessage }[] = [];
+    for (let i = 0; i < messages.length; i += 2) {
+      result.push({ user: messages[i], bot: messages[i + 1] });
+    }
+    return result;
+  }, [messages]);
 
   return (
     <div className="relative flex h-full w-full max-w-3xl flex-col">
