@@ -79,8 +79,8 @@ export default function Sidebar() {
           <span className="ml-3 text-white">새 채팅</span>
         </button>
       </div>
-      <div className="p-4">
-        <h2 className="text-grey-500 text-sm">채팅</h2>
+      <div className="flex min-h-0 flex-1 flex-col p-4">
+        <h2 className="text-grey-500 shrink-0 text-sm">채팅</h2>
         <ChatList
           list={chatList}
           onDelete={handleDelete}

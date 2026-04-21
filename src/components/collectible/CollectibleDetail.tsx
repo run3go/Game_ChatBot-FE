@@ -4,7 +4,7 @@ import {
   ArmoryCollectible,
   ArmoryCollectibleDetail,
 } from '@/types/collectible';
-import Image from 'next/image';
+import SkeletonImage from '@/components/common/SkeletonImage';
 import { useState } from 'react';
 
 export default function CollectibleDetail({
@@ -24,7 +24,7 @@ export default function CollectibleDetail({
     <>
       {/* 헤더 */}
       <div className="flex items-center gap-2 border-b border-gray-100 px-4 py-3">
-        <Image
+        <SkeletonImage
           src={selected.icon}
           alt={selected.type}
           width={24}

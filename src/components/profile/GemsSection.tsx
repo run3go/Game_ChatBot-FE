@@ -2,7 +2,7 @@
 
 import { GRADE_STYLE } from '@/lib/datas/color';
 import { ArmoryGem, ArmoryGemEffect } from '@/types/skill';
-import Image from 'next/image';
+import SkeletonImage from '@/components/common/SkeletonImage';
 
 function GemBadge({ level, grade }: { level: number; grade: string }) {
   const style = GRADE_STYLE[grade] ?? { solidBadge: 'bg-gray-400 text-white' };
@@ -49,7 +49,7 @@ export default function GemsSection({
               className="group relative flex flex-col items-center"
             >
               <div className="relative">
-                <Image
+                <SkeletonImage
                   src={gem.icon}
                   alt={gem.name}
                   width={40}

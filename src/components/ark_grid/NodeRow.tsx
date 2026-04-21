@@ -1,7 +1,7 @@
 import { GRADE_STYLE } from '@/lib/datas/color';
 import highlightText from '@/lib/utils/highlightText';
 import { ArkGridCoreItem, ArkGridGemItem } from '@/types/ark_grid';
-import Image from 'next/image';
+import SkeletonImage from '@/components/common/SkeletonImage';
 import { useState } from 'react';
 import GemStack from './GemStack';
 
@@ -24,7 +24,7 @@ export default function NodeRow({
         onClick={() => setOpen((v) => !v)}
         className="flex w-full cursor-pointer items-center gap-3 px-4 py-3 text-left transition-colors duration-150 hover:bg-gray-100/80"
       >
-        <Image
+        <SkeletonImage
           src={core.icon}
           alt={core.name}
           width={40}

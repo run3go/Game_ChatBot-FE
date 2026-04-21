@@ -1,6 +1,6 @@
 import { GRADE_STYLE } from '@/lib/datas/color';
 import { ArkGridGemItem } from '@/types/ark_grid';
-import Image from 'next/image';
+import SkeletonImage from '@/components/common/SkeletonImage';
 import { useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import GemTooltip from './GemTooltip';
@@ -33,7 +33,7 @@ export default function GemItem({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <Image
+      <SkeletonImage
         width={28}
         height={28}
         src={gem.icon}

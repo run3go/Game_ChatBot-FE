@@ -21,16 +21,17 @@ export default function ChatList({
 }: ChatListProps) {
   const router = useRouter();
   const { id: currentChatId } = useParams();
-  const isLoadingTitle = useChatStore((state) => state.isLoadingTitle);
+  const loadingTitleChatId = useChatStore((state) => state.loadingTitleChatId);
 
   return (
-    <ul className="mt-3 flex flex-col">
+    <ul className="scrollbar-hide mt-3 flex flex-col overflow-y-scroll">
       {list.map((item) => {
-        const isSkeleton = isLoadingTitle && item.chat_id === currentChatId;
+        const isSkeleton = loadingTitleChatId === item.chat_id;
         return isSkeleton ? (
           <li
             key={item.chat_id}
-            className="animate-shimmer border-primary-500 rounded-lg border-l-4 p-3"
+            className="animate-shimmer border-primary-500 cursor-pointer rounded-lg border-l-4 p-3"
+            onClick={() => router.push(`/chat/${item.chat_id}`)}
           >
             <div className="h-5" />
           </li>

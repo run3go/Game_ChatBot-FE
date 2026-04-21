@@ -48,7 +48,7 @@ export const pollDagStatus = async (
         } else if (status === 'failed') {
           resolve('failed');
         } else {
-          onStatus(`데이터 수집 중이에요... (${status})`);
+          onStatus(`데이터 수집 중이에요...`);
           setTimeout(check, intervalMs);
         }
       } catch {
@@ -65,7 +65,8 @@ export const askAIStream = async (
   callbacks: AskAIStreamCallbacks,
   signal?: AbortSignal,
 ) => {
-  const { onChunk, onStructured, onConfirmCollect, onStatus, onTitle } = callbacks;
+  const { onChunk, onStructured, onConfirmCollect, onStatus, onTitle } =
+    callbacks;
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/ask/stream`,

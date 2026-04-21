@@ -4,31 +4,43 @@ import { devtools } from 'zustand/middleware';
 
 interface ChatStore {
   pendingMessage: string | null;
-  messages: ChatMessage[];
+  messageCache: Record<string, ChatMessage[]>;
   pendingTitleUpdate: { chatId: string; title: string } | null;
-  isLoadingTitle: boolean;
+  loadingTitleChatId: string | null;
   chatListRefreshKey: number;
   setPendingMessage: (msg: string | null) => void;
-  setMessages: (updater: (prev: ChatMessage[]) => ChatMessage[]) => void;
+  setCacheMessages: (chatId: string, messages: ChatMessage[]) => void;
+  updateCacheMsg: (chatId: string, updater: (prev: ChatMessage[]) => ChatMessage[]) => void;
   resetChat: () => void;
-  setPendingTitleUpdate: (update: { chatId: string; title: string } | null) => void;
-  setIsLoadingTitle: (loading: boolean) => void;
+  setPendingTitleUpdate: (
+    update: { chatId: string; title: string } | null,
+  ) => void;
+  setLoadingTitleChatId: (chatId: string | null) => void;
   refreshChatList: () => void;
 }
 
 export const useChatStore = create<ChatStore>()(
   devtools((set) => ({
     pendingMessage: null,
-    messages: [],
+    messageCache: {},
     pendingTitleUpdate: null,
-    isLoadingTitle: false,
+    loadingTitleChatId: null,
     chatListRefreshKey: 0,
     setPendingMessage: (msg) => set({ pendingMessage: msg }),
-    setMessages: (updater) =>
-      set((state) => ({ messages: updater(state.messages) })),
-    resetChat: () => set({ pendingMessage: null, messages: [] }),
+    setCacheMessages: (chatId, messages) =>
+      set((state) => ({
+        messageCache: { ...state.messageCache, [chatId]: messages },
+      })),
+    updateCacheMsg: (chatId, updater) =>
+      set((state) => ({
+        messageCache: {
+          ...state.messageCache,
+          [chatId]: updater(state.messageCache[chatId] ?? []),
+        },
+      })),
+    resetChat: () => set({ pendingMessage: null }),
     setPendingTitleUpdate: (update) => set({ pendingTitleUpdate: update }),
-    setIsLoadingTitle: (loading) => set({ isLoadingTitle: loading }),
+    setLoadingTitleChatId: (chatId) => set({ loadingTitleChatId: chatId }),
     refreshChatList: () =>
       set((state) => ({ chatListRefreshKey: state.chatListRefreshKey + 1 })),
   })),

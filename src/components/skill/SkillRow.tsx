@@ -1,7 +1,7 @@
 'use client';
 
 import { ArmoryGem, ArmorySkill } from '@/types/skill';
-import Image from 'next/image';
+import SkeletonImage from '@/components/common/SkeletonImage';
 import { useState } from 'react';
 
 const GRADE_STYLE: Record<string, string> = {
@@ -47,7 +47,7 @@ export default function SkillRow({ skill, gems = [] }: Props) {
       <div className="shrink-0">
         <div className="size-10 overflow-hidden rounded-lg bg-indigo-100 ring-2 ring-indigo-200">
           {skill.skill_icon_url ? (
-            <Image
+            <SkeletonImage
               src={skill.skill_icon_url ?? ''}
               alt="스킬 이미지"
               width={40}

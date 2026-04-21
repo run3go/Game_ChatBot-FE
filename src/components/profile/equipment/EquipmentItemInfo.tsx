@@ -1,6 +1,6 @@
 import { GRADE_STYLE } from '@/lib/datas/color';
 import { ArmoryEquipment } from '@/types/profile';
-import Image from 'next/image';
+import SkeletonImage from '@/components/common/SkeletonImage';
 import { Fragment } from 'react';
 import QualityBar from './QualityBar';
 import {
@@ -53,7 +53,7 @@ export default function EquipmentItemInfo({ item }: { item: ArmoryEquipment }) {
   return (
     <>
       <div className="relative shrink-0">
-        <Image
+        <SkeletonImage
           src={item.icon}
           alt={item.name}
           width={40}

@@ -3,7 +3,7 @@ import {
   ArkPassiveName,
   ArkPassivePointItem,
 } from '@/types/ark_passive';
-import Image from 'next/image';
+import SkeletonImage from '@/components/common/SkeletonImage';
 
 const PASSIVE_STYLE: Record<string, { background: string; text: string }> = {
   진화: { background: 'bg-[#d6b76f]', text: 'text-[#d6b76f]' },
@@ -61,7 +61,7 @@ export default function PassiveItem({
               <div className={tierGroups[tier].length === 1 ? 'flex flex-col gap-2' : 'grid grid-cols-2 gap-2'}>
                 {tierGroups[tier].map((item) => (
                   <div key={item.effect_name} className="group relative flex items-center gap-2 text-sm">
-                    <Image
+                    <SkeletonImage
                       alt={item.effect_name}
                       src={item.icon ?? ''}
                       width={24}
@@ -106,7 +106,7 @@ export default function PassiveItem({
       <ul className="flex flex-col gap-3 text-sm">
         {filteredEffects.map((item) => (
           <div key={item.effect_name} className="flex items-center gap-2">
-            <Image
+            <SkeletonImage
               alt={item.effect_name}
               src={item.icon ?? ''}
               width={20}

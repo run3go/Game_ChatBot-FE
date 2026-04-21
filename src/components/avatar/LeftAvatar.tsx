@@ -1,6 +1,6 @@
 import { GRADE_STYLE } from '@/lib/datas/color';
 import { ArmoryAvatar } from '@/types/avatar';
-import Image from 'next/image';
+import SkeletonImage from '@/components/common/SkeletonImage';
 import AvatarTooltip from './AvatarTooltip';
 
 const SLOT_LABEL: Record<string, string> = {
@@ -24,7 +24,7 @@ export default function LeftAvatar({ avatar }: { avatar: ArmoryAvatar }) {
             className={`rounded-lg p-0.5 ${gradeStyle?.badge ?? 'border border-white/10 bg-white/5'}`}
           >
             {avatar.icon ? (
-              <Image
+              <SkeletonImage
                 src={avatar.icon}
                 alt={avatar.name}
                 width={44}

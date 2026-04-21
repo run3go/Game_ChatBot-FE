@@ -1,7 +1,8 @@
 'use client';
 
 import { ArmoryCollectible, CollectibleData } from '@/types/collectible';
-import Image, { StaticImageData } from 'next/image';
+import SkeletonImage from '@/components/common/SkeletonImage';
+import { StaticImageData } from 'next/image';
 import { useState } from 'react';
 import CollectibleDetail from './CollectibleDetail';
 
@@ -67,7 +68,7 @@ export default function Collectible({ data }: { data: CollectibleData }) {
                   </span>
                 )}
                 <div className="relative">
-                  <Image
+                  <SkeletonImage
                     src={ICON_IMAGE[item.type]}
                     alt={item.type}
                     width={40}

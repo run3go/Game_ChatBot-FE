@@ -3,7 +3,7 @@
 import { GRADE_STYLE } from '@/lib/datas/color';
 import highlightText from '@/lib/utils/highlightText';
 import { ArmoryEngraving, EngravingData } from '@/types/engraving';
-import Image from 'next/image';
+import SkeletonImage from '@/components/common/SkeletonImage';
 import { useState } from 'react';
 
 export default function EngravingList({ data }: { data: EngravingData }) {
@@ -29,7 +29,7 @@ export default function EngravingList({ data }: { data: EngravingData }) {
             >
               <div className="shrink-0">
                 {engraving.icon_url ? (
-                  <Image
+                  <SkeletonImage
                     src={engraving.icon_url}
                     alt={engraving.name}
                     width={40}

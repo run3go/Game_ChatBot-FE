@@ -1,13 +1,13 @@
 'use client';
 
+import { UIResult } from '@/components/chat/UIContainer';
 import { useChatScroll } from '@/hooks/useChatScroll';
 import { askAIStream, pollDagStatus, triggerUpdate } from '@/lib/apis/askAI';
-import { UIResult } from '@/components/chat/UIContainer';
 import { deleteChatSession, getChatMessages } from '@/lib/apis/user';
 import { useChatStore } from '@/store/chatStore';
 import { ChatMessage } from '@/types/chat';
 import { IconChevronDown } from '@tabler/icons-react';
-import { useParams } from 'next/navigation';
+import { notFound, useParams, useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import ChatInput from './ChatInput';
 import MessagePair from './MessagePair';
@@ -15,11 +15,28 @@ import MessagePair from './MessagePair';
 const CONFIRM_COLLECT_ANSWER = '예';
 
 export default function ChatContainer() {
+  const router = useRouter();
   const { id: chatId } = useParams<{ id: string }>();
-  const { messages, setMessages, pendingMessage, setPendingMessage, setPendingTitleUpdate, setIsLoadingTitle, refreshChatList } =
-    useChatStore();
+  const {
+    messageCache,
+    setCacheMessages,
+    updateCacheMsg,
+    pendingMessage,
+    setPendingMessage,
+    setPendingTitleUpdate,
+    setLoadingTitleChatId,
+    refreshChatList,
+  } = useChatStore();
 
+  const [isNotFound, setIsNotFound] = useState(false);
   const [streamingId, setStreamingId] = useState<string | null>(null);
+
+  if (isNotFound) notFound();
+
+  const messages = useMemo(
+    () => messageCache[chatId] ?? [],
+    [messageCache, chatId],
+  );
   const [inputValue, setInputValue] = useState('');
   const [statusText, setStatusText] = useState('');
   const {
@@ -52,14 +69,15 @@ export default function ChatContainer() {
   useEffect(() => {
     if (pendingMessage) {
       sessionRef.current.isNew = true;
-      setMessages(() => []);
+      setCacheMessages(chatId, []);
       setPendingMessage(null);
       handleSend(pendingMessage);
-    } else {
+    } else if (!messageCache[chatId]?.length) {
       getChatMessages(chatId)
         .then((history) => {
-          if (!history.length) return;
-          setMessages(() =>
+          if (!history.length) { setIsNotFound(true); return; }
+          setCacheMessages(
+            chatId,
             history.map((m, i) => ({
               id: `${i}-${m.role}`,
               role:
@@ -69,13 +87,13 @@ export default function ChatContainer() {
             })),
           );
         })
-        .catch(() => {});
+        .catch(() => setIsNotFound(true));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const updateBotMsg = (id: string, update: Partial<ChatMessage>) =>
-    setMessages((prev) =>
+    updateCacheMsg(chatId, (prev) =>
       prev.map((msg) => (msg.id === id ? { ...msg, ...update } : msg)),
     );
 
@@ -87,14 +105,17 @@ export default function ChatContainer() {
     sessionRef.current.hasSent = true;
 
     // 데이터 수집 확인 응답 처리
-    if (pendingCollectRef.current && question.trim() === CONFIRM_COLLECT_ANSWER) {
+    if (
+      pendingCollectRef.current &&
+      question.trim() === CONFIRM_COLLECT_ANSWER
+    ) {
       const { nickname, question: originalQuestion } =
         pendingCollectRef.current;
       pendingCollectRef.current = null;
 
       const userMsgId = `${Date.now()}-user`;
       const botMsgId = `${Date.now()}-bot`;
-      setMessages((prev) => [
+      updateCacheMsg(chatId, (prev) => [
         ...prev,
         { id: userMsgId, role: 'user', content: question },
         { id: botMsgId, role: 'bot', content: '' },
@@ -142,10 +163,10 @@ export default function ChatContainer() {
       controller.abort();
     }, 30000);
 
-    if (sessionRef.current.isNew) setIsLoadingTitle(true);
+    if (sessionRef.current.isNew) setLoadingTitleChatId(chatId);
     setLastUserMsgId(userMsgId);
     setStreamingId(botMsgId);
-    setMessages((prev) => [
+    updateCacheMsg(chatId, (prev) => [
       ...prev,
       { id: userMsgId, role: 'user', content: question },
       { id: botMsgId, role: 'bot', content: '' },
@@ -192,7 +213,7 @@ export default function ChatContainer() {
       const aborted = controller.signal.aborted;
       setStreamingId(null);
       setStatusText('');
-      setIsLoadingTitle(false);
+      setLoadingTitleChatId(null);
       if (!aborted) setInputValue('');
       abortControllerRef.current = null;
     }

@@ -1,7 +1,7 @@
 'use client';
 
 import { AvatarData } from '@/types/avatar';
-import Image from 'next/image';
+import SkeletonImage from '@/components/common/SkeletonImage';
 import LeftAvatar from './LeftAvatar';
 import RightAvatar from './RightAvatar';
 
@@ -60,7 +60,7 @@ export default function AvatarList({ data }: { data: AvatarData }) {
           <div className="pointer-events-none absolute inset-0 flex items-end justify-center">
             <div className="relative">
               <div className="absolute inset-x-0 bottom-0 h-3/4 rounded-full bg-indigo-500/10 blur-3xl" />
-              <Image
+              <SkeletonImage
                 src={profile.character_image}
                 alt={profile.character_name}
                 width={300}

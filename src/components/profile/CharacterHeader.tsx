@@ -1,7 +1,7 @@
 'use client';
 
 import { ArmoryProfile } from '@/types/profile';
-import Image from 'next/image';
+import SkeletonImage from '@/components/common/SkeletonImage';
 
 export default function CharacterHeader({
   profile,
@@ -53,7 +53,7 @@ export default function CharacterHeader({
       </div>
       {profile.character_image && (
         <div className="absolute top-0 right-0 bottom-0 w-100 overflow-hidden">
-          <Image
+          <SkeletonImage
             src={profile.character_image}
             alt={profile.character_name}
             sizes={'100'}
