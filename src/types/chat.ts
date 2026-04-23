@@ -13,4 +13,5 @@ export type ChatMessage = {
   content: string;
   ui_type?: string;
   result?: UIResult;
+  data_updated_at?: string;
 };

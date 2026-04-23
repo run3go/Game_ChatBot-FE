@@ -7,7 +7,7 @@ import { deleteChatSession, getChatMessages } from '@/lib/apis/user';
 import { useChatStore } from '@/store/chatStore';
 import { ChatMessage } from '@/types/chat';
 import { IconChevronDown } from '@tabler/icons-react';
-import { notFound, useParams, useRouter } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import ChatInput from './ChatInput';
 import MessagePair from './MessagePair';
@@ -15,7 +15,6 @@ import MessagePair from './MessagePair';
 const CONFIRM_COLLECT_ANSWER = '예';
 
 export default function ChatContainer() {
-  const router = useRouter();
   const { id: chatId } = useParams<{ id: string }>();
   const {
     messageCache,
@@ -194,6 +193,9 @@ export default function ChatContainer() {
           },
           onTitle: (title) => {
             setPendingTitleUpdate({ chatId, title });
+          },
+          onDataUpdatedAt: (value) => {
+            updateBotMsg(botMsgId, { data_updated_at: value });
           },
         },
         controller.signal,

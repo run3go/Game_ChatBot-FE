@@ -46,3 +46,16 @@ export const deleteChatSession = async (chatId: string): Promise<void> => {
     method: 'DELETE',
   });
 };
+
+export const getRecentNickname = async (): Promise<string | null> => {
+  try {
+    const res = await fetch(
+      `${BASE_URL}/users/recent-nickname?user_id=${getUserId()}`,
+    );
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.nickname ?? null;
+  } catch {
+    return null;
+  }
+};

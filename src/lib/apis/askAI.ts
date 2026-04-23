@@ -7,6 +7,7 @@ export interface AskAIStreamCallbacks {
   onConfirmCollect: (nickname: string) => void;
   onStatus: (status: string) => void;
   onTitle: (title: string) => void;
+  onDataUpdatedAt: (value: string) => void;
 }
 
 export const triggerUpdate = async (characterName: string): Promise<string> => {
@@ -65,7 +66,7 @@ export const askAIStream = async (
   callbacks: AskAIStreamCallbacks,
   signal?: AbortSignal,
 ) => {
-  const { onChunk, onStructured, onConfirmCollect, onStatus, onTitle } =
+  const { onChunk, onStructured, onConfirmCollect, onStatus, onTitle, onDataUpdatedAt } =
     callbacks;
   try {
     const res = await fetch(
@@ -110,6 +111,8 @@ export const askAIStream = async (
           onStatus(parsed.content);
         } else if (parsed.type === 'title') {
           onTitle(parsed.content);
+        } else if (parsed.type === 'data_updated_at') {
+          onDataUpdatedAt(parsed.value);
         }
       }
     }

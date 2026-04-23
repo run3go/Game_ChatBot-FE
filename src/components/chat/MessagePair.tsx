@@ -48,7 +48,10 @@ export default React.memo(function MessagePair({
           <div className="w-full pb-1.5">
             {streamingId === bot.id && bot.content === '' ? (
               <div className="prose prose-sm px-4 pt-1 text-gray-700">
-                <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  rehypePlugins={[rehypeRaw]}
+                >
                   {statusText}
                 </ReactMarkdown>
               </div>
@@ -57,12 +60,29 @@ export default React.memo(function MessagePair({
                 <UIContainer result={bot.result} />
                 {bot.content && (
                   <div className="prose prose-sm px-4 pt-1 text-gray-700">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      rehypePlugins={[rehypeRaw]}
+                    >
                       {bot.content}
                     </ReactMarkdown>
                   </div>
                 )}
               </>
+            )}
+            {bot.data_updated_at && (
+              <div className="mt-2 flex justify-end px-4">
+                <span className="text-xs text-gray-400">
+                  {new Date(bot.data_updated_at).toLocaleString('ko-KR', {
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false,
+                  })}{' '}
+                  갱신
+                </span>
+              </div>
             )}
           </div>
         </div>
