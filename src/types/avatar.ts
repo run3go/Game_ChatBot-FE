@@ -20,7 +20,10 @@ export interface ArmoryAvatar {
   is_set: boolean;
   is_inner: boolean;
   basic_effect: string | null;
-  tendency_stat: string | null;
+  tendency_charm: number;
+  tendency_courage: number;
+  tendency_intellect: number;
+  tendency_kindness: number;
   source: string | null;
 }
 

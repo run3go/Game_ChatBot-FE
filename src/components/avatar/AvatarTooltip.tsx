@@ -11,18 +11,22 @@ interface Props {
   align?: 'left' | 'right'; // 툴팁 방향: left = 오른쪽패널(왼쪽으로 펼침), right = 왼쪽패널(오른쪽으로 펼침)
 }
 
-function parseTendency(raw: string): string[] {
-  return raw.split(/ (?=[가-힣])/).map((s) => s.trim()).filter(Boolean);
-}
-
-export default function AvatarTooltip({ avatar, children, align = 'right' }: Props) {
+export default function AvatarTooltip({
+  avatar,
+  children,
+  align = 'right',
+}: Props) {
   const gradeStyle = GRADE_STYLE[avatar.grade];
-  const tendencyLines = avatar.tendency_stat ? parseTendency(avatar.tendency_stat) : [];
-  const hasTooltipContent = avatar.basic_effect || tendencyLines.length > 0;
+  const hasTooltipContent =
+    avatar.basic_effect ||
+    avatar.tendency_charm ||
+    avatar.tendency_courage ||
+    avatar.tendency_intellect ||
+    avatar.tendency_kindness;
 
   const ref = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
-
+  console.log(hasTooltipContent);
   if (!hasTooltipContent) return <>{children}</>;
 
   const GAP = 12;
@@ -33,15 +37,20 @@ export default function AvatarTooltip({ avatar, children, align = 'right' }: Pro
     const rect = ref.current.getBoundingClientRect();
     const centerY = rect.top + rect.height / 2;
     const left =
-      align === 'right'
-        ? rect.right + GAP
-        : rect.left - GAP - TOOLTIP_WIDTH;
+      align === 'right' ? rect.right + GAP : rect.left - GAP - TOOLTIP_WIDTH;
     setPos({ top: centerY, left });
   }
 
   function handleMouseLeave() {
     setPos(null);
   }
+
+  const tendency_line = [
+    { label: '매력', value: avatar.tendency_charm },
+    { label: '담력', value: avatar.tendency_courage },
+    { label: '지성', value: avatar.tendency_intellect },
+    { label: '친절', value: avatar.tendency_kindness },
+  ];
 
   return (
     <div
@@ -59,7 +68,9 @@ export default function AvatarTooltip({ avatar, children, align = 'right' }: Pro
             style={{ top: pos.top, left: pos.left }}
           >
             {/* 이름 */}
-            <p className={`text-base font-bold leading-snug ${gradeStyle?.text ?? 'text-gray-200'}`}>
+            <p
+              className={`text-base leading-snug font-bold ${gradeStyle?.text ?? 'text-gray-200'}`}
+            >
               {avatar.name}
             </p>
 
@@ -79,20 +90,18 @@ export default function AvatarTooltip({ avatar, children, align = 'right' }: Pro
             )}
 
             {/* 성향 */}
-            {tendencyLines.length > 0 && (
-              <div className="mt-2.5 border-t border-white/10 pt-2.5">
-                <p className="mb-1 text-[12px] font-semibold tracking-wide text-gray-500 uppercase">
-                  성향
-                </p>
-                <div className="space-y-0.5">
-                  {tendencyLines.map((line, i) => (
-                    <p key={i} className="text-sm text-gray-300">
-                      {line}
-                    </p>
-                  ))}
-                </div>
+            <div className="mt-2.5 border-t border-white/10 pt-2.5">
+              <p className="mb-1 text-[12px] font-semibold tracking-wide text-gray-500 uppercase">
+                성향
+              </p>
+              <div className="space-y-0.5">
+                {tendency_line.map((line, i) => (
+                  <p key={i} className="text-sm text-gray-300">
+                    {line.label}: {line.value}
+                  </p>
+                ))}
               </div>
-            )}
+            </div>
           </div>,
           document.body,
         )}

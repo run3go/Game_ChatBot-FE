@@ -1,7 +1,7 @@
 'use client';
 
-import { AvatarData } from '@/types/avatar';
 import SkeletonImage from '@/components/common/SkeletonImage';
+import { AvatarData } from '@/types/avatar';
 import LeftAvatar from './LeftAvatar';
 import RightAvatar from './RightAvatar';
 
@@ -64,9 +64,9 @@ export default function AvatarList({ data }: { data: AvatarData }) {
                 src={profile.character_image}
                 alt={profile.character_name}
                 width={300}
-                height={540}
+                height={440}
                 quality={100}
-                className="relative h-110 w-auto object-cover object-top drop-shadow-2xl"
+                className="relative h-110 w-auto object-cover drop-shadow-2xl"
                 style={{ imageRendering: 'crisp-edges' }}
               />
               <div className="absolute right-0 bottom-0 left-0 z-10 h-12 bg-linear-to-t from-[#14181d] to-transparent" />
@@ -90,7 +90,7 @@ export default function AvatarList({ data }: { data: AvatarData }) {
         </div>
 
         {/* 가운데 — 이미지 높이 유지용 스페이서 */}
-        <div className="min-w-32 min-h-110" />
+        <div className="min-h-110 min-w-32" />
 
         {/* 오른쪽 — 덧입기 아바타 (그라디언트로 바깥은 불투명, 안쪽은 투명) */}
         <div className="relative z-10 bg-linear-to-l from-[#14181d] via-[#14181d]/80 to-transparent py-4 pr-4 pl-2">
