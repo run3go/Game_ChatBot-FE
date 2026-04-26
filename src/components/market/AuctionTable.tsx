@@ -1,7 +1,6 @@
 import Pagination from '@/components/common/Pagination';
 import {
   ACCESSORY_STAT_RANGE,
-  DUAL_STAT_PCT_MAX,
   MAINSTREAM_STATS,
   TIER_RULES,
   TIER_STYLE,
@@ -15,19 +14,24 @@ type SortDir = 'asc' | 'desc';
 
 const PAGE_SIZE = 6;
 const BASE_STATS = new Set(['힘', '민첩', '지능', '체력', '깨달음']);
+
+function extractStatName(key: string): string {
+  return key.replace(/\s*[%+]+$/, '').trim();
+}
 const BRACELET_EXCLUDE = new Set(['도약', '부여 효과 수량']);
 
-function getOptTier(statName: string, rawVal: string): OptionTier | null {
+function getOptTier(statKey: string, rawVal: string): OptionTier | null {
+  const statName = extractStatName(statKey);
   if (!MAINSTREAM_STATS.has(statName)) return null;
   const num = parseFloat(rawVal.replace(/,/g, ''));
   if (isNaN(num)) return null;
   const rules = TIER_RULES.filter((r) => r.stat === statName);
   if (!rules.length) return null;
-  const pctMax = DUAL_STAT_PCT_MAX[statName] ?? 100;
+  const isPct = statKey.trimEnd().endsWith('%');
   const rule =
     rules.length === 1
       ? rules[0]
-      : (rules.find((r) => r.pct === num < pctMax) ?? rules[0]);
+      : (rules.find((r) => r.pct === isPct) ?? rules[0]);
   if (num >= rule.상) return '상';
   if (num >= rule.중) return '중';
   return '하';
@@ -50,14 +54,7 @@ function getStatPercent(name: string, value: number): number | null {
 function formatOptValue(key: string, rawVal: string): string {
   const num = parseFloat(rawVal.replace(/,/g, ''));
   if (isNaN(num)) return rawVal;
-  const rules = TIER_RULES.filter((r) => r.stat === key);
-  const pctMax = DUAL_STAT_PCT_MAX[key] ?? 100;
-  const isPercent =
-    rules.length === 0
-      ? num < pctMax
-      : rules.length === 1
-        ? rules[0].pct
-        : (rules.find((r) => r.pct === num < pctMax) ?? rules[0]).pct;
+  const isPercent = key.trimEnd().endsWith('%');
   return isPercent ? `+${num}%` : `+${num.toLocaleString('ko-KR')}`;
 }
 
@@ -65,7 +62,7 @@ function getImportantOpts(row: DataRow): { key: string; value: string }[] {
   const opts = row.options;
   if (!opts || typeof opts !== 'object') return [];
   return Object.entries(opts as Record<string, unknown>)
-    .filter(([key]) => !BASE_STATS.has(key))
+    .filter(([key]) => !BASE_STATS.has(extractStatName(key)))
     .slice(0, 3)
     .map(([key, value]) => ({ key: key.trim(), value: String(value) }));
 }
@@ -95,9 +92,11 @@ function getBraceletStatColor(val: number): string {
 
 function BraceletCard({ row }: { row: DataRow }) {
   const opts = row.options as Record<string, number> | null;
-  const grantCount = opts?.['부여 효과 수량'];
+  const grantCount = Object.entries(opts ?? {}).find(
+    ([k]) => extractStatName(k) === '부여 효과 수량',
+  )?.[1];
   const combatStats = Object.entries(opts ?? {}).filter(
-    ([key]) => !BRACELET_EXCLUDE.has(key),
+    ([key]) => !BRACELET_EXCLUDE.has(extractStatName(key)),
   );
 
   return (
@@ -163,15 +162,17 @@ export default function AuctionTable({ data }: { data: DataRow[] }) {
   function getRowSortVal(row: DataRow): number {
     if (sortKey === 'stat_pct') {
       const opts = row.options as Record<string, number> | null;
-      const trioVal = opts?.['힘'] ?? opts?.['민첩'] ?? opts?.['지능'];
+      const trioVal = opts?.['힘 +'] ?? opts?.['민첩 +'] ?? opts?.['지능 +'];
       if (trioVal == null) return -1;
       return getStatPercent(String(row.name ?? ''), trioVal) ?? -1;
     }
     return Number(row[sortKey] ?? 0);
   }
 
-  const isBraceletData = data.some(
-    (r) => (r.options as Record<string, number> | null)?.['부여 효과 수량'] != null,
+  const isBraceletData = data.some((r) =>
+    Object.keys((r.options as Record<string, number> | null) ?? {}).some(
+      (k) => extractStatName(k) === '부여 효과 수량',
+    ),
   );
 
   const sortKeys = isBraceletData
@@ -220,10 +221,10 @@ export default function AuctionTable({ data }: { data: DataRow[] }) {
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {pageData.map((row, i) => {
           const opts = row.options as Record<string, number> | null;
-          if (opts?.['부여 효과 수량'] != null)
+          if (Object.keys(opts ?? {}).some((k) => extractStatName(k) === '부여 효과 수량'))
             return <BraceletCard key={i} row={row} />;
 
-          const trioVal = opts?.['힘'] ?? opts?.['민첩'] ?? opts?.['지능'];
+          const trioVal = opts?.['힘 +'] ?? opts?.['민첩 +'] ?? opts?.['지능 +'];
           const important = getImportantOpts(row);
 
           const tiers = important.map((opt) => getOptTier(opt.key, opt.value));

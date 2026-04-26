@@ -1,7 +1,7 @@
 'use client';
 
-import { ArmoryGem, ArmorySkill } from '@/types/skill';
 import SkeletonImage from '@/components/common/SkeletonImage';
+import { ArmoryGem, ArmorySkill } from '@/types/skill';
 import { useState } from 'react';
 
 const GRADE_STYLE: Record<string, string> = {
@@ -18,8 +18,22 @@ const GEM_SHORT_NAME: Record<string, string> = {
   작열의: '작',
   멸화의: '멸',
   홍염의: '홍',
-  광휘의: '광',
 };
+
+const EFFECT_TYPE_SHORT: Record<string, string> = {
+  '피해 증가': '겁',
+  '재사용 대기시간 감소': '작',
+};
+
+function gemShortName(gem: ArmoryGem): string {
+  const nameKey = gem.name.split(' ')[1];
+  return (
+    GEM_SHORT_NAME[nameKey] ??
+    EFFECT_TYPE_SHORT[gem.effect_type_name] ??
+    nameKey?.[0] ??
+    '?'
+  );
+}
 
 interface Props {
   skill: ArmorySkill;
@@ -29,6 +43,7 @@ interface Props {
 const TRIPOD_COLORS = ['bg-teal-400', 'bg-indigo-400', 'bg-violet-400'];
 
 export default function SkillRow({ skill, gems = [] }: Props) {
+  console.log(gems);
   const tripods = [
     skill.tripod_1_name,
     skill.tripod_2_name,
@@ -135,7 +150,7 @@ export default function SkillRow({ skill, gems = [] }: Props) {
             className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${GRADE_STYLE[gem.grade] ?? 'bg-gray-100 text-gray-600'}`}
           >
             {gem.level}
-            {GEM_SHORT_NAME[gem.name.split(' ')[1]]}
+            {gemShortName(gem)}
           </div>
         ))}
       </div>

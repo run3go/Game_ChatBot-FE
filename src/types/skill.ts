@@ -40,8 +40,9 @@ export interface ArmoryGem {
   grade: '고급' | '희귀' | '영웅' | '전설' | '유물' | '고대' | string;
   level: number;
   skill_name: string;
-  effect_type: string;
-  effect_option: string;
+  effect_type_name: string;
+  effect_type_value: number;
+  basic_attack_boost_value: number;
   icon: string;
 }
 
