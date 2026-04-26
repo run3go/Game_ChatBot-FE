@@ -1,10 +1,35 @@
 export type OptionTier = '하' | '중' | '상';
 
 export const ARMOR_TYPES = new Set([
-  '투구', '상의', '하의', '장갑', '어깨', '무기', '보주',
+  '투구',
+  '상의',
+  '하의',
+  '장갑',
+  '어깨',
+  '무기',
+  '보주',
 ]);
 export const ACCESSORY_TYPES = new Set(['목걸이', '귀걸이', '반지']);
 export const STONE_TYPE = '어빌리티 스톤';
+
+// 퍼센트·정수 두 버전이 같은 키로 저장되는 스탯의 퍼센트 상한
+export const DUAL_STAT_PCT_MAX: Record<string, number> = {
+  공격력: 10,
+  '무기 공격력': 10,
+};
+
+export const MAINSTREAM_STATS = new Set([
+  '공격력',
+  '무기 공격력',
+  '추가 피해',
+  '적에게 주는 피해 증가',
+  '치명타 적중률',
+  '치명타 피해',
+  '낙인력',
+  '세레나데, 신앙, 조화 게이지 획득량 증가',
+  '아군 공격력 강화 효과',
+  '아군 피해량 강화 효과',
+]);
 
 export const TIER_RULES: Array<{
   stat: string;
@@ -17,11 +42,16 @@ export const TIER_RULES: Array<{
   { stat: '낙인력', pct: true, 중: 4.8, 상: 8 },
   { stat: '무기 공격력', pct: true, 중: 1.8, 상: 3 },
   { stat: '무기 공격력', pct: false, 중: 480, 상: 960 },
-  { stat: '심태이상 공격 지속시간', pct: true, 중: 0.5, 상: 1 },
-  { stat: '세레나데, 신앙', pct: true, 중: 3.6, 상: 6 },
+  { stat: '상태이상 공격 지속시간', pct: true, 중: 0.5, 상: 1 },
+  {
+    stat: '세레나데, 신앙, 조화 게이지 획득량 증가',
+    pct: true,
+    중: 3.6,
+    상: 6,
+  },
   { stat: '아군 공격력 강화 효과', pct: true, 중: 3, 상: 5 },
   { stat: '아군 피해량 강화 효과', pct: true, 중: 4.5, 상: 7.5 },
-  { stat: '적에게 주는 피해', pct: true, 중: 1.2, 상: 2 },
+  { stat: '적에게 주는 피해 증가', pct: true, 중: 1.2, 상: 2 },
   { stat: '전투 중 생명력 회복량', pct: false, 중: 25, 상: 50 },
   { stat: '최대 마나', pct: false, 중: 15, 상: 30 },
   { stat: '최대 생명력', pct: false, 중: 3250, 상: 6500 },
@@ -44,7 +74,10 @@ export const TIER_BADGE: Record<OptionTier, string> = {
   상: 'bg-yellow-400 text-white',
 };
 
-export const ACCESSORY_STAT_RANGE: Record<string, { min: number; max: number }> = {
+export const ACCESSORY_STAT_RANGE: Record<
+  string,
+  { min: number; max: number }
+> = {
   목걸이: { min: 15178, max: 17857 },
   귀걸이: { min: 11806, max: 13889 },
   반지: { min: 10962, max: 12897 },
@@ -59,16 +92,18 @@ export function getQualityColor(quality: number): string {
 }
 
 export function splitEffectLines(text: string): string[] {
+  const trimmed = text.trim();
+  if (trimmed.startsWith('{')) {
+    try {
+      const obj = JSON.parse(trimmed) as Record<string, string | number>;
+      return Object.entries(obj).map(([key, val]) => `${key} +${val}`);
+    } catch {
+      // fall through to line-based parsing
+    }
+  }
   return text
     .split('\n')
     .flatMap((line) => line.split(/(?<=[\d%])\s*(?=[가-힣])/))
-    .filter(Boolean);
-}
-
-export function splitBraceletEffects(text: string): string[] {
-  return text
-    .split(/\n|,\s*/)
-    .map((s) => s.trim())
     .filter(Boolean);
 }
 
@@ -76,14 +111,34 @@ export function parseStoneEngravings(
   effect: string | null,
 ): Array<{ name: string; level: number }> {
   if (!effect) return [];
-  const parts = effect.includes('\n') ? effect.split('\n') : effect.split(/,\s*/);
+  const trimmed = effect.trim();
+  if (trimmed.startsWith('{')) {
+    try {
+      const obj = JSON.parse(trimmed) as {
+        engravings?: Record<string, number>;
+      };
+      if (obj.engravings) {
+        return Object.entries(obj.engravings).map(([name, level]) => ({
+          name,
+          level,
+        }));
+      }
+      return [];
+    } catch {
+      // fall through
+    }
+  }
+  const parts = effect.includes('\n')
+    ? effect.split('\n')
+    : effect.split(/,\s*/);
   return parts
     .map((s) => s.trim())
     .filter((s) => s && !s.includes('레벨 보너스'))
     .map((line) => {
       const cleaned = line.replace(/[\[\]]/g, '').trim();
       const lvMatch = cleaned.match(/^(.*?)\s*Lv\.(\d+)/);
-      if (lvMatch) return { name: lvMatch[1].trim(), level: parseInt(lvMatch[2], 10) };
+      if (lvMatch)
+        return { name: lvMatch[1].trim(), level: parseInt(lvMatch[2], 10) };
       const plusMatch = cleaned.match(/^(.*?)\s*\+(\d+)/);
       if (plusMatch)
         return {
@@ -94,7 +149,10 @@ export function parseStoneEngravings(
     });
 }
 
-export function splitEffectParts(effect: string): { name: string; value: string } {
+export function splitEffectParts(effect: string): {
+  name: string;
+  value: string;
+} {
   const m = effect.match(/^(.*?)(\+[\d,.]+%?.*)$/);
   if (m) return { name: m[1].trim(), value: m[2].trim() };
   return { name: effect, value: '' };
@@ -106,7 +164,10 @@ export function getEffectTier(effect: string): OptionTier {
   const value = parseFloat(m[1].replace(/,/g, ''));
   const isPercent = m[2] === '%';
   for (const rule of TIER_RULES) {
-    if (effect.includes(rule.stat) && (rule.pct === null || rule.pct === isPercent)) {
+    if (
+      effect.includes(rule.stat) &&
+      (rule.pct === null || rule.pct === isPercent)
+    ) {
       if (value === rule.상) return '상';
       if (value === rule.중) return '중';
       return '하';
@@ -119,9 +180,53 @@ export function parseAccessoryStat(
   basicEffect: string | null,
 ): { stat: string; value: number } | null {
   if (!basicEffect) return null;
+  const trimmed = basicEffect.trim();
+  if (trimmed.startsWith('{')) {
+    try {
+      const obj = JSON.parse(trimmed) as Record<string, string | number>;
+      for (const stat of ['힘', '민첩', '지능']) {
+        if (stat in obj) {
+          const raw = obj[stat];
+          const num = parseInt(String(raw).replace(/,/g, ''), 10);
+          if (!isNaN(num)) return { stat, value: num };
+        }
+      }
+      return null;
+    } catch {
+      // fall through
+    }
+  }
   for (const stat of ['힘', '민첩', '지능']) {
     const match = basicEffect.match(new RegExp(`${stat}\\s*\\+?([\\d,]+)`));
     if (match) return { stat, value: parseInt(match[1].replace(/,/g, ''), 10) };
   }
   return null;
+}
+
+export function splitBraceletEffects(text: string): string[] {
+  const trimmed = text.trim();
+  if (trimmed.startsWith('{')) {
+    const obj = JSON.parse(trimmed) as {
+      stats?: Record<string, number>;
+      special_effects?: string[];
+    };
+    const lines: string[] = [];
+    if (obj.stats) {
+      for (const [stat, value] of Object.entries(obj.stats)) {
+        lines.push(`${stat} +${value}`);
+      }
+    }
+    if (obj.special_effects) {
+      lines.push(...obj.special_effects);
+    }
+    return lines;
+  }
+  if (trimmed.startsWith('[')) {
+    const arr = JSON.parse(trimmed) as string[];
+    return arr;
+  }
+  return text
+    .split('\n')
+    .flatMap((line) => line.split(/(?<=[\d%])\s*(?=[가-힣])/))
+    .filter(Boolean);
 }

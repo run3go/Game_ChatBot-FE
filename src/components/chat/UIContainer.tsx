@@ -4,6 +4,7 @@ import { AvatarResult } from '@/types/avatar';
 import { CollectibleResult } from '@/types/collectible';
 import { EngravingResult } from '@/types/engraving';
 import { ExpeditionResult } from '@/types/expedition';
+import { AuctionResult, MarketResult } from '@/types/market';
 import { ProfileResult } from '@/types/profile';
 import { SkillResult } from '@/types/skill';
 import { TotalInfoResult } from '@/types/total_info';
@@ -13,6 +14,8 @@ import AvatarList from '../avatar/AvatarList';
 import Collectible from '../collectible/Collectible';
 import EngravingList from '../engraving/EngravingList';
 import Expedition from '../expedition/Expedition';
+import AuctionTable from '../market/AuctionTable';
+import DataTable from '../market/DataTable';
 import Profile from '../profile/Profile';
 import SkillList from '../skill/SkillList';
 import TotalInfo from '../total_info/TotalInfo';
@@ -33,6 +36,8 @@ type UIResult =
   | AvatarResult
   | ProfileResult
   | TotalInfoResult
+  | MarketResult
+  | AuctionResult
   | ConfirmCollectResult;
 
 export type { ConfirmCollectResult, UIResult };
@@ -79,6 +84,10 @@ export default function UIContainer({
             return <Profile data={result.data} />;
           case 'TOTAL_INFO':
             return <TotalInfo data={result.data} />;
+          case 'MARKET':
+            return <DataTable data={result.data} />;
+          case 'AUCTION':
+            return <AuctionTable data={result.data} />;
           default:
             return null;
         }
