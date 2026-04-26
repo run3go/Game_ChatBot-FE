@@ -1,6 +1,6 @@
+import SkeletonImage from '@/components/common/SkeletonImage';
 import { GRADE_STYLE } from '@/lib/datas/color';
 import { ArmoryEquipment } from '@/types/profile';
-import SkeletonImage from '@/components/common/SkeletonImage';
 import { Fragment } from 'react';
 import QualityBar from './QualityBar';
 import {
@@ -19,8 +19,12 @@ import {
 } from './utils';
 
 export default function EquipmentItemInfo({ item }: { item: ArmoryEquipment }) {
-  const gradeStyle = GRADE_STYLE[item.grade] ?? { text: 'text-gray-500', background: '' };
-  const enhLabel = item.enhancement_level > 0 ? `+${item.enhancement_level}` : null;
+  const gradeStyle = GRADE_STYLE[item.grade] ?? {
+    text: 'text-gray-500',
+    background: '',
+  };
+  const enhLabel =
+    item.enhancement_level > 0 ? `+${item.enhancement_level}` : null;
 
   const isAccessory = ACCESSORY_TYPES.has(item.type);
   const accessoryEffects =
@@ -29,7 +33,9 @@ export default function EquipmentItemInfo({ item }: { item: ArmoryEquipment }) {
       : [];
 
   const stoneEngravings =
-    item.type === STONE_TYPE ? parseStoneEngravings(item.additional_effect) : [];
+    item.type === STONE_TYPE
+      ? parseStoneEngravings(item.additional_effect)
+      : [];
 
   const braceletEffects =
     item.type === '팔찌' && item.additional_effect
@@ -37,7 +43,9 @@ export default function EquipmentItemInfo({ item }: { item: ArmoryEquipment }) {
       : [];
 
   const accessoryRange = ACCESSORY_STAT_RANGE[item.type] ?? null;
-  const accessoryStat = accessoryRange ? parseAccessoryStat(item.basic_effect) : null;
+  const accessoryStat = accessoryRange
+    ? parseAccessoryStat(item.basic_effect)
+    : null;
   const accessoryPct =
     accessoryRange && accessoryStat !== null
       ? Math.round(
@@ -84,20 +92,36 @@ export default function EquipmentItemInfo({ item }: { item: ArmoryEquipment }) {
             {item.type}
           </span>
         </div>
-        <QualityBar
-          quality={displayQuality}
-          label={qualityLabel}
-          hideLabel={accessoryPct !== null}
-          hidePercent={ARMOR_TYPES.has(item.type)}
-        />
-        {braceletEffects.length > 0 && (
-          <div className="mt-1 flex flex-col gap-0.5">
-            {braceletEffects.map((line, i) => (
-              <p key={i} className="text-[12px] leading-tight text-gray-500">
-                {line}
-              </p>
-            ))}
+        {item.type === '팔찌' ? (
+          <div className="mt-1 flex min-w-0 items-start gap-2">
+            <div className="min-w-0">
+              <QualityBar
+                quality={displayQuality}
+                label={qualityLabel}
+                hideLabel={accessoryPct !== null}
+                hidePercent={ARMOR_TYPES.has(item.type)}
+              />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="flex min-w-0 items-center gap-2">
+                {braceletEffects.slice(0, 2).map((line, i) => (
+                  <span
+                    key={i}
+                    className="min-w-0 truncate overflow-hidden text-[12px] leading-tight text-ellipsis whitespace-nowrap text-gray-600"
+                  >
+                    {line}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
+        ) : (
+          <QualityBar
+            quality={displayQuality}
+            label={qualityLabel}
+            hideLabel={accessoryPct !== null}
+            hidePercent={ARMOR_TYPES.has(item.type)}
+          />
         )}
       </div>
 
@@ -116,7 +140,9 @@ export default function EquipmentItemInfo({ item }: { item: ArmoryEquipment }) {
                 <span className="w-22.5 truncate text-xs leading-none text-gray-600">
                   {name}
                 </span>
-                <span className={`text-[11px] leading-tight font-semibold ${TIER_STYLE[tier]}`}>
+                <span
+                  className={`text-[11px] leading-tight font-semibold ${TIER_STYLE[tier]}`}
+                >
                   {value}
                 </span>
               </Fragment>
@@ -126,10 +152,12 @@ export default function EquipmentItemInfo({ item }: { item: ArmoryEquipment }) {
       )}
 
       {stoneEngravings.length > 0 && (
-        <div className="grid grid-cols-[1fr_auto] items-center gap-x-2 gap-y-0.5 text-xs">
+        <div className="grid grid-cols-[1fr_auto] items-center gap-x-2 gap-y-0.5 pr-10 text-xs">
           {stoneEngravings.map((eng, i) => (
             <Fragment key={i}>
-              <span className="truncate leading-tight text-gray-600">{eng.name}</span>
+              <span className="truncate text-right leading-tight text-gray-600">
+                {eng.name}
+              </span>
               <span
                 className={`leading-tight font-semibold ${i === 2 ? 'text-red-500' : 'text-blue-600'}`}
               >
@@ -137,6 +165,23 @@ export default function EquipmentItemInfo({ item }: { item: ArmoryEquipment }) {
               </span>
             </Fragment>
           ))}
+        </div>
+      )}
+
+      {braceletEffects.length > 0 && (
+        <div className="mt-1 min-w-0">
+          <div className="mb-1 min-w-0">
+            <div className="min-w-0 space-y-0.5">
+              {braceletEffects.slice(2, 5).map((line, i) => (
+                <p
+                  key={i}
+                  className="w-40 min-w-0 truncate overflow-hidden text-xs leading-4 text-ellipsis whitespace-nowrap text-gray-500"
+                >
+                  {line}
+                </p>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </>

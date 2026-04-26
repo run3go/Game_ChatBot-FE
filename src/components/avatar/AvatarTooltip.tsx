@@ -26,7 +26,6 @@ export default function AvatarTooltip({
 
   const ref = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
-  console.log(hasTooltipContent);
   if (!hasTooltipContent) return <>{children}</>;
 
   const GAP = 12;

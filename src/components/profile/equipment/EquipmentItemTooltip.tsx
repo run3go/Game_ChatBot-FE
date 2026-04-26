@@ -8,12 +8,21 @@ import {
   splitEffectLines,
 } from './utils';
 
-export default function EquipmentItemTooltip({ item }: { item: ArmoryEquipment }) {
-  const gradeStyle = GRADE_STYLE[item.grade] ?? { text: 'text-gray-500', background: '' };
+export default function EquipmentItemTooltip({
+  item,
+}: {
+  item: ArmoryEquipment;
+}) {
+  const gradeStyle = GRADE_STYLE[item.grade] ?? {
+    text: 'text-gray-500',
+    background: '',
+  };
   const qualityColor = getQualityColor(item.quality);
 
   const stoneEngravings =
-    item.type === STONE_TYPE ? parseStoneEngravings(item.additional_effect) : null;
+    item.type === STONE_TYPE
+      ? parseStoneEngravings(item.additional_effect)
+      : null;
   const additionalLines =
     !stoneEngravings && item.additional_effect
       ? item.type === '팔찌'
@@ -38,14 +47,18 @@ export default function EquipmentItemTooltip({ item }: { item: ArmoryEquipment }
               style={{ width: `${Math.max(0, Math.min(100, item.quality))}%` }}
             />
           </div>
-          <span className="text-[12px] font-bold text-gray-300">{item.quality}%</span>
+          <span className="text-[12px] font-bold text-gray-300">
+            {item.quality}%
+          </span>
         </div>
       )}
 
       {item.basic_effect && (
         <>
           <div className="my-2 border-t border-gray-700" />
-          <p className="mb-1 text-[12px] font-semibold text-gray-300">기본 효과</p>
+          <p className="mb-1 text-[12px] font-semibold text-gray-300">
+            기본 효과
+          </p>
           {splitEffectLines(item.basic_effect).map((line, i) => (
             <p key={i} className="text-[12px] leading-relaxed text-gray-400">
               {line}
@@ -57,7 +70,9 @@ export default function EquipmentItemTooltip({ item }: { item: ArmoryEquipment }
       {item.additional_effect && (
         <>
           <div className="my-2 border-t border-gray-700" />
-          <p className="mb-1 text-[12px] font-semibold text-gray-300">추가 효과</p>
+          <p className="mb-1 text-[12px] font-semibold text-gray-300">
+            추가 효과
+          </p>
           {stoneEngravings
             ? stoneEngravings.map((eng, i) => (
                 <p
@@ -73,7 +88,10 @@ export default function EquipmentItemTooltip({ item }: { item: ArmoryEquipment }
                 </p>
               ))
             : additionalLines?.map((line, i) => (
-                <p key={i} className="text-[12px] leading-relaxed text-gray-400">
+                <p
+                  key={i}
+                  className="text-[12px] leading-relaxed text-gray-400"
+                >
                   {line}
                 </p>
               ))}
