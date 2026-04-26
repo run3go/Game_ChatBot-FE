@@ -1,6 +1,8 @@
 import { UIResult } from '@/components/chat/UIContainer';
 import { getUserId } from '../userId';
 
+export class RateLimitError extends Error {}
+
 export interface AskAIStreamCallbacks {
   onChunk: (chunk: string) => void;
   onStructured: (payload: UIResult) => void;
@@ -82,6 +84,10 @@ export const askAIStream = async (
         signal,
       },
     );
+    if (res.status === 429) {
+      const data = await res.json().catch(() => ({}));
+      throw new RateLimitError(data.detail ?? '오늘의 질문 횟수를 모두 사용했어요.');
+    }
     if (!res.ok || !res.body) throw new Error(await res.text());
     const reader = res.body.getReader();
     const decoder = new TextDecoder();

@@ -47,6 +47,19 @@ export const deleteChatSession = async (chatId: string): Promise<void> => {
   });
 };
 
+export const getCallCount = async (): Promise<number> => {
+  try {
+    const res = await fetch(
+      `${BASE_URL}/users/call-count?user_id=${getUserId()}`,
+    );
+    if (!res.ok) return 0;
+    const data = await res.json();
+    return data.call_count ?? 0;
+  } catch {
+    return 0;
+  }
+};
+
 export const getRecentNickname = async (): Promise<string | null> => {
   try {
     const res = await fetch(

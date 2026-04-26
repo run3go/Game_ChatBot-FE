@@ -8,6 +8,8 @@ interface ChatStore {
   pendingTitleUpdate: { chatId: string; title: string } | null;
   loadingTitleChatId: string | null;
   chatListRefreshKey: number;
+  callCount: number | null;
+  callCountRefreshKey: number;
   setPendingMessage: (msg: string | null) => void;
   setCacheMessages: (chatId: string, messages: ChatMessage[]) => void;
   updateCacheMsg: (chatId: string, updater: (prev: ChatMessage[]) => ChatMessage[]) => void;
@@ -17,6 +19,8 @@ interface ChatStore {
   ) => void;
   setLoadingTitleChatId: (chatId: string | null) => void;
   refreshChatList: () => void;
+  setCallCount: (n: number) => void;
+  refreshCallCount: () => void;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -26,6 +30,8 @@ export const useChatStore = create<ChatStore>()(
     pendingTitleUpdate: null,
     loadingTitleChatId: null,
     chatListRefreshKey: 0,
+    callCount: null,
+    callCountRefreshKey: 0,
     setPendingMessage: (msg) => set({ pendingMessage: msg }),
     setCacheMessages: (chatId, messages) =>
       set((state) => ({
@@ -43,5 +49,8 @@ export const useChatStore = create<ChatStore>()(
     setLoadingTitleChatId: (chatId) => set({ loadingTitleChatId: chatId }),
     refreshChatList: () =>
       set((state) => ({ chatListRefreshKey: state.chatListRefreshKey + 1 })),
+    setCallCount: (n) => set({ callCount: n }),
+    refreshCallCount: () =>
+      set((state) => ({ callCountRefreshKey: state.callCountRefreshKey + 1 })),
   })),
 );

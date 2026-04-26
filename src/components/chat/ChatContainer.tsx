@@ -2,7 +2,7 @@
 
 import { UIResult } from '@/components/chat/UIContainer';
 import { useChatScroll } from '@/hooks/useChatScroll';
-import { askAIStream, pollDagStatus, triggerUpdate } from '@/lib/apis/askAI';
+import { askAIStream, pollDagStatus, RateLimitError, triggerUpdate } from '@/lib/apis/askAI';
 import { deleteChatSession, getChatMessages } from '@/lib/apis/user';
 import { useChatStore } from '@/store/chatStore';
 import { ChatMessage } from '@/types/chat';
@@ -25,6 +25,7 @@ export default function ChatContainer() {
     setPendingTitleUpdate,
     setLoadingTitleChatId,
     refreshChatList,
+    refreshCallCount,
   } = useChatStore();
 
   const [isNotFound, setIsNotFound] = useState(false);
@@ -200,8 +201,10 @@ export default function ChatContainer() {
         },
         controller.signal,
       );
-    } catch {
-      if (timedOut) {
+    } catch (e) {
+      if (e instanceof RateLimitError) {
+        updateBotMsg(botMsgId, { content: e.message });
+      } else if (timedOut) {
         updateBotMsg(botMsgId, {
           content: '응답 시간이 초과되었어요. 다시 시도해 주세요.',
         });
@@ -216,7 +219,10 @@ export default function ChatContainer() {
       setStreamingId(null);
       setStatusText('');
       setLoadingTitleChatId(null);
-      if (!aborted) setInputValue('');
+      if (!aborted) {
+        setInputValue('');
+        refreshCallCount();
+      }
       abortControllerRef.current = null;
     }
   };
