@@ -1,8 +1,8 @@
 'use client';
 
+import SkeletonImage from '@/components/common/SkeletonImage';
 import { GRADE_STYLE } from '@/lib/datas/color';
 import { ArmoryGem, ArmoryGemEffect } from '@/types/skill';
-import SkeletonImage from '@/components/common/SkeletonImage';
 
 function GemBadge({ level, grade }: { level: number; grade: string }) {
   const style = GRADE_STYLE[grade] ?? { solidBadge: 'bg-gray-400 text-white' };
@@ -39,8 +39,8 @@ export default function GemsSection({
       <div className="flex justify-between">
         {[...gems]
           .sort((a, b) => {
-            if (a.effect_type !== b.effect_type)
-              return a.effect_type.localeCompare(b.effect_type);
+            if (a.effect_type_name !== b.effect_type_name)
+              return a.effect_type_name.localeCompare(b.effect_type_name);
             return b.level - a.level;
           })
           .map((gem) => (
@@ -63,7 +63,7 @@ export default function GemsSection({
                   {gem.skill_name}
                 </p>
                 <p className="mt-0.5 text-[12px] text-gray-400">
-                  {gem.effect_type}
+                  {gem.effect_type_name}
                 </p>
               </div>
             </div>
