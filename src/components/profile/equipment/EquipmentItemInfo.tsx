@@ -6,12 +6,12 @@ import QualityBar from './QualityBar';
 import {
   ACCESSORY_STAT_RANGE,
   ACCESSORY_TYPES,
-  ARMOR_TYPES,
   STONE_TYPE,
   TIER_BADGE,
   TIER_STYLE,
   getEffectTier,
   parseAccessoryStat,
+  parseOrbParadisePower,
   parseStoneEngravings,
   splitBraceletEffects,
   splitEffectLines,
@@ -55,8 +55,22 @@ export default function EquipmentItemInfo({ item }: { item: ArmoryEquipment }) {
         )
       : null;
 
-  const displayQuality = accessoryPct !== null ? accessoryPct : item.quality;
-  const qualityLabel = accessoryStat !== null ? accessoryStat.stat : '품질';
+  const statBadge = accessoryPct !== null ? `스탯 ${accessoryPct}%` : null;
+
+  const paradisePower =
+    item.type === '보주' ? parseOrbParadisePower(item.additional_effect) : null;
+  const statBadgeColor =
+    accessoryPct === null
+      ? ''
+      : accessoryPct === 100
+        ? 'text-orange-500'
+        : accessoryPct >= 90
+          ? 'text-purple-600'
+          : accessoryPct >= 70
+            ? 'text-blue-500'
+            : accessoryPct >= 30
+              ? 'text-green-600'
+              : 'text-gray-400';
 
   return (
     <>
@@ -91,16 +105,23 @@ export default function EquipmentItemInfo({ item }: { item: ArmoryEquipment }) {
           <span className="rounded bg-gray-100 px-1 py-0.5 text-[12px] text-gray-500">
             {item.type}
           </span>
+          {statBadge && (
+            <span
+              className={`rounded bg-gray-100 px-1 py-0.5 text-[11px] font-semibold ${statBadgeColor}`}
+            >
+              {statBadge}
+            </span>
+          )}
+          {paradisePower !== null && (
+            <span className="rounded bg-gray-100 px-1 py-0.5 text-[11px] font-semibold text-indigo-500">
+              낙원력 {Math.floor(paradisePower / 10000).toLocaleString('ko-KR')}만
+            </span>
+          )}
         </div>
         {item.type === '팔찌' ? (
           <div className="mt-1 flex min-w-0 items-start gap-2">
             <div className="min-w-0">
-              <QualityBar
-                quality={displayQuality}
-                label={qualityLabel}
-                hideLabel={accessoryPct !== null}
-                hidePercent={ARMOR_TYPES.has(item.type)}
-              />
+              <QualityBar quality={item.quality} label="품질" />
             </div>
             <div className="min-w-0 flex-1">
               <div className="flex min-w-0 items-center gap-2">
@@ -116,12 +137,7 @@ export default function EquipmentItemInfo({ item }: { item: ArmoryEquipment }) {
             </div>
           </div>
         ) : (
-          <QualityBar
-            quality={displayQuality}
-            label={qualityLabel}
-            hideLabel={accessoryPct !== null}
-            hidePercent={ARMOR_TYPES.has(item.type)}
-          />
+          <QualityBar quality={item.quality} label="품질" />
         )}
       </div>
 

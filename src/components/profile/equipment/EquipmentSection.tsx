@@ -15,7 +15,7 @@ export default function EquipmentSection({
     ['목걸이', '귀걸이', '반지', '팔찌'].includes(e.type),
   );
   const abilityStone = equipment.filter((e) => e.type === '어빌리티 스톤');
-  const bojeong = equipment.filter((e) => e.type === '보주');
+  const orb = equipment.filter((e) => e.type === '보주');
 
   return (
     <div className="grid grid-cols-1 gap-3 sm:grid-cols-[5fr_7fr]">
@@ -31,13 +31,13 @@ export default function EquipmentSection({
           </div>
         </div>
 
-        {bojeong.length > 0 && (
+        {orb.length > 0 && (
           <div className="rounded-2xl bg-white p-3 shadow-sm">
             <p className="mb-2 text-sm font-bold tracking-wide text-gray-400 uppercase">
               보주
             </p>
             <div className="flex flex-col gap-0.5">
-              {bojeong.map((item, i) => (
+              {orb.map((item, i) => (
                 <EquipmentItem key={i} item={item} />
               ))}
             </div>

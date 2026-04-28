@@ -83,6 +83,15 @@ export const ACCESSORY_STAT_RANGE: Record<
   반지: { min: 10962, max: 12897 },
 };
 
+export function parseOrbParadisePower(effect: string | null): number | null {
+  if (!effect) return null;
+  const text = effect.trim().startsWith('{')
+    ? (() => { try { return JSON.stringify(JSON.parse(effect)); } catch { return effect; } })()
+    : effect;
+  const match = text.match(/낙원력[^0-9]*([\d,]+)/);
+  return match ? parseInt(match[1].replace(/,/g, ''), 10) : null;
+}
+
 export function getQualityColor(quality: number): string {
   if (quality === 100) return 'bg-orange-300';
   if (quality >= 90) return 'bg-purple-600';
@@ -96,7 +105,11 @@ export function splitEffectLines(text: string): string[] {
   if (trimmed.startsWith('{')) {
     try {
       const obj = JSON.parse(trimmed) as Record<string, string | number>;
-      return Object.entries(obj).map(([key, val]) => `${key} +${val}`);
+      return Object.entries(obj).flatMap(([key, val]) =>
+        key === 'description'
+          ? String(val).split(/\s*\|\s*/).filter(Boolean)
+          : [`${key} +${val}`],
+      );
     } catch {
       // fall through to line-based parsing
     }
