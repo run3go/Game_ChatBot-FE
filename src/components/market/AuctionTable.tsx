@@ -15,6 +15,28 @@ type SortDir = 'asc' | 'desc';
 const PAGE_SIZE = 6;
 const BASE_STATS = new Set(['힘', '민첩', '지능', '체력', '깨달음']);
 
+const GRADE_STYLE: Record<string, string> = {
+  고대: 'bg-amber-100 text-amber-700',
+  유물: 'bg-orange-100 text-orange-700',
+  전설: 'bg-yellow-100 text-yellow-700',
+  영웅: 'bg-purple-100 text-purple-700',
+  희귀: 'bg-blue-100 text-blue-700',
+  고급: 'bg-green-100 text-green-700',
+};
+
+function parseOptions(raw: unknown): Record<string, number> | null {
+  if (!raw) return null;
+  if (typeof raw === 'string') {
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return null;
+    }
+  }
+  if (typeof raw === 'object') return raw as Record<string, number>;
+  return null;
+}
+
 function extractStatName(key: string): string {
   return key.replace(/\s*[%+]+$/, '').trim();
 }
@@ -59,12 +81,63 @@ function formatOptValue(key: string, rawVal: string): string {
 }
 
 function getImportantOpts(row: DataRow): { key: string; value: string }[] {
-  const opts = row.options;
-  if (!opts || typeof opts !== 'object') return [];
-  return Object.entries(opts as Record<string, unknown>)
+  const opts = parseOptions(row.options);
+  if (!opts) return [];
+  return Object.entries(opts)
     .filter(([key]) => !BASE_STATS.has(extractStatName(key)))
     .slice(0, 3)
     .map(([key, value]) => ({ key: key.trim(), value: String(value) }));
+}
+
+function GemCard({ row }: { row: DataRow }) {
+  const opts = parseOptions(row.options);
+  console.log('[GemCard] row.options raw:', row.options, '→ parsed:', opts);
+  const skillEntry = Object.entries(opts ?? {})[0];
+  const skillName = skillEntry
+    ? skillEntry[0].replace(/\s*%$/, '').trim()
+    : null;
+  const skillPct = skillEntry ? Number(skillEntry[1]) : null;
+  const grade = String(row.grade ?? '');
+
+  return (
+    <div className="flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-sm">
+      <div className="flex items-start justify-between gap-2">
+        <span className="text-sm leading-snug font-semibold text-gray-800">
+          {String(row.name ?? '-')}
+        </span>
+        {grade && (
+          <span
+            className={`shrink-0 rounded-md px-1.5 py-0.5 text-xs font-semibold ${GRADE_STYLE[grade] ?? 'bg-gray-100 text-gray-500'}`}
+          >
+            {grade}
+          </span>
+        )}
+      </div>
+
+      <div className="flex items-center gap-3 rounded-xl bg-gray-50 px-4 py-3">
+        {skillName ? (
+          <>
+            <span className="text-sm text-gray-600">{skillName}</span>
+            {skillPct != null && (
+              <span className="text-sm font-bold text-orange-500">
+                +{skillPct}%
+              </span>
+            )}
+          </>
+        ) : (
+          <span className="w-full text-center text-sm text-gray-300">-</span>
+        )}
+      </div>
+
+      <div className="flex justify-end">
+        <span className="text-sm font-bold text-indigo-600">
+          {row.buy_price != null
+            ? Number(row.buy_price).toLocaleString('ko-KR') + 'G'
+            : '-'}
+        </span>
+      </div>
+    </div>
+  );
 }
 
 function QualityBadge({ value }: { value: number }) {
@@ -84,14 +157,15 @@ function QualityBadge({ value }: { value: number }) {
 }
 
 function getBraceletStatColor(val: number): string {
-  if (val >= 120) return 'text-orange-500 [text-shadow:0_0_8px_rgba(249,115,22,0.6)]';
+  if (val >= 120)
+    return 'text-orange-500 [text-shadow:0_0_8px_rgba(249,115,22,0.6)]';
   if (val >= 100) return 'text-purple-600';
-  if (val >= 81)  return 'text-blue-600';
+  if (val >= 81) return 'text-blue-600';
   return 'text-green-600';
 }
 
 function BraceletCard({ row }: { row: DataRow }) {
-  const opts = row.options as Record<string, number> | null;
+  const opts = parseOptions(row.options);
   const grantCount = Object.entries(opts ?? {}).find(
     ([k]) => extractStatName(k) === '부여 효과 수량',
   )?.[1];
@@ -102,7 +176,7 @@ function BraceletCard({ row }: { row: DataRow }) {
   return (
     <div className="flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-sm">
       <div className="flex items-start justify-between gap-2">
-        <span className="text-sm font-semibold leading-snug text-gray-800">
+        <span className="text-sm leading-snug font-semibold text-gray-800">
           {String(row.name ?? '-')}
         </span>
         {row.quality != null && <QualityBadge value={Number(row.quality)} />}
@@ -112,7 +186,9 @@ function BraceletCard({ row }: { row: DataRow }) {
         {combatStats.map(([key, val]) => (
           <span key={key} className="text-xs text-gray-500">
             {key}{' '}
-            <span className={`font-semibold ${getBraceletStatColor(Number(val))}`}>
+            <span
+              className={`font-semibold ${getBraceletStatColor(Number(val))}`}
+            >
               {Number(val).toLocaleString('ko-KR')}
             </span>
           </span>
@@ -149,6 +225,7 @@ export default function AuctionTable({ data }: { data: DataRow[] }) {
 
   if (!data || data.length === 0) return null;
 
+  console.log(data);
   function toggleSort(key: SortKey) {
     if (sortKey === key) {
       setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
@@ -161,7 +238,7 @@ export default function AuctionTable({ data }: { data: DataRow[] }) {
 
   function getRowSortVal(row: DataRow): number {
     if (sortKey === 'stat_pct') {
-      const opts = row.options as Record<string, number> | null;
+      const opts = parseOptions(row.options);
       const trioVal = opts?.['힘 +'] ?? opts?.['민첩 +'] ?? opts?.['지능 +'];
       if (trioVal == null) return -1;
       return getStatPercent(String(row.name ?? ''), trioVal) ?? -1;
@@ -170,14 +247,17 @@ export default function AuctionTable({ data }: { data: DataRow[] }) {
   }
 
   const isBraceletData = data.some((r) =>
-    Object.keys((r.options as Record<string, number> | null) ?? {}).some(
+    Object.keys(parseOptions(r.options) ?? {}).some(
       (k) => extractStatName(k) === '부여 효과 수량',
     ),
   );
 
-  const sortKeys = isBraceletData
-    ? (['buy_price'] as SortKey[])
-    : (['quality', 'buy_price', 'stat_pct'] as SortKey[]);
+  const isGemData = data.some((r) => String(r.name ?? '').includes('의 보석'));
+
+  const sortKeys =
+    isBraceletData || isGemData
+      ? (['buy_price'] as SortKey[])
+      : (['quality', 'buy_price', 'stat_pct'] as SortKey[]);
 
   const sorted = [...data].sort((a, b) => {
     const av = getRowSortVal(a);
@@ -220,11 +300,19 @@ export default function AuctionTable({ data }: { data: DataRow[] }) {
       {/* 카드 그리드 */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {pageData.map((row, i) => {
-          const opts = row.options as Record<string, number> | null;
-          if (Object.keys(opts ?? {}).some((k) => extractStatName(k) === '부여 효과 수량'))
+          const opts = parseOptions(row.options);
+          if (
+            Object.keys(opts ?? {}).some(
+              (k) => extractStatName(k) === '부여 효과 수량',
+            )
+          )
             return <BraceletCard key={i} row={row} />;
 
-          const trioVal = opts?.['힘 +'] ?? opts?.['민첩 +'] ?? opts?.['지능 +'];
+          if (String(row.name ?? '').includes('의 보석'))
+            return <GemCard key={i} row={row} />;
+
+          const trioVal =
+            opts?.['힘 +'] ?? opts?.['민첩 +'] ?? opts?.['지능 +'];
           const important = getImportantOpts(row);
 
           const tiers = important.map((opt) => getOptTier(opt.key, opt.value));
