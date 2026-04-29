@@ -2,7 +2,7 @@
 
 import { getCallCount } from '@/lib/apis/user';
 import { useChatStore } from '@/store/chatStore';
-import { IconDeviceGamepadFilled } from '@tabler/icons-react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
@@ -21,7 +21,9 @@ function CallCountBadge({ count }: { count: number | null }) {
       : 'bg-gray-100 text-gray-500';
 
   return (
-    <div className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium ${style}`}>
+    <div
+      className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium ${style}`}
+    >
       <span>오늘 질문</span>
       <span className="font-bold">
         {count} / {MAX_CALLS}
@@ -35,7 +37,9 @@ export default function Header() {
   const resetChat = useChatStore((state) => state.resetChat);
   const callCount = useChatStore((state) => state.callCount);
   const setCallCount = useChatStore((state) => state.setCallCount);
-  const callCountRefreshKey = useChatStore((state) => state.callCountRefreshKey);
+  const callCountRefreshKey = useChatStore(
+    (state) => state.callCountRefreshKey,
+  );
   const router = useRouter();
 
   useEffect(() => {
@@ -50,10 +54,14 @@ export default function Header() {
   return (
     <div className="flex h-16 w-full items-center justify-between border-b border-gray-200 bg-white px-6 py-3">
       <div className="flex cursor-pointer items-center" onClick={handleClick}>
-        <div className="mr-3 grid size-10 place-items-center rounded-lg bg-linear-to-r from-indigo-500 to-violet-500">
-          <IconDeviceGamepadFilled color="white" size={25} />
-        </div>
-        <h1 className="text-xl font-bold">My Game Chat Bot</h1>
+        <Image
+          src="/icon.png"
+          alt="무물봇"
+          width={60}
+          height={60}
+          unoptimized
+        />
+        <h1 className="text-xl font-bold">무물봇</h1>
       </div>
       <CallCountBadge count={callCount} />
     </div>

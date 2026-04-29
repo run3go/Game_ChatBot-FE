@@ -26,7 +26,13 @@ export default function ChatContainer() {
     setLoadingTitleChatId,
     refreshChatList,
     refreshCallCount,
+    sessionTitles,
   } = useChatStore();
+
+  useEffect(() => {
+    const title = sessionTitles[chatId];
+    document.title = title ? `${title} | 무물봇` : '무물봇';
+  }, [chatId, sessionTitles]);
 
   const [isNotFound, setIsNotFound] = useState(false);
   const [streamingId, setStreamingId] = useState<string | null>(null);

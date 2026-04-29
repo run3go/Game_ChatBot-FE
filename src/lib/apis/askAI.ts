@@ -51,7 +51,7 @@ export const pollDagStatus = async (
         } else if (status === 'failed') {
           resolve('failed');
         } else {
-          onStatus(`데이터 수집 중이에요...`);
+          onStatus(`지금은 데이터 수집 중이에요. 약 1분 정도 소요됩니다.`);
           setTimeout(check, intervalMs);
         }
       } catch {
@@ -68,8 +68,14 @@ export const askAIStream = async (
   callbacks: AskAIStreamCallbacks,
   signal?: AbortSignal,
 ) => {
-  const { onChunk, onStructured, onConfirmCollect, onStatus, onTitle, onDataUpdatedAt } =
-    callbacks;
+  const {
+    onChunk,
+    onStructured,
+    onConfirmCollect,
+    onStatus,
+    onTitle,
+    onDataUpdatedAt,
+  } = callbacks;
   try {
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_API_BASE_URL}/ask/stream`,
@@ -86,7 +92,9 @@ export const askAIStream = async (
     );
     if (res.status === 429) {
       const data = await res.json().catch(() => ({}));
-      throw new RateLimitError(data.detail ?? '오늘의 질문 횟수를 모두 사용했어요.');
+      throw new RateLimitError(
+        data.detail ?? '오늘의 질문 횟수를 모두 사용했어요.',
+      );
     }
     if (!res.ok || !res.body) throw new Error(await res.text());
     const reader = res.body.getReader();

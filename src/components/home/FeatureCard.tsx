@@ -10,7 +10,8 @@ interface FeatureCardProps {
   title: string;
   description: string;
   examples?: string[];
-  onExampleClick?: (example: string) => void;
+  onExampleClick?: (message: string) => void;
+  comingSoon?: boolean;
 }
 
 export default function FeatureCard({
@@ -20,16 +21,22 @@ export default function FeatureCard({
   description,
   examples = [],
   onExampleClick,
+  comingSoon = false,
 }: FeatureCardProps) {
   const [hovered, setHovered] = useState(false);
 
   return (
     <div
-      className="relative"
-      onMouseEnter={() => setHovered(true)}
+      className={`relative ${comingSoon ? 'opacity-50' : ''}`}
+      onMouseEnter={() => !comingSoon && setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div className="flex w-full flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div className="flex h-full w-full flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        {comingSoon && (
+          <span className="absolute right-3 top-3 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-400">
+            준비 중
+          </span>
+        )}
         <div
           className={`mb-4 grid size-12 place-items-center rounded-xl ${iconBgColor}`}
         >

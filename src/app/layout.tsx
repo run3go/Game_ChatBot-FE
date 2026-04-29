@@ -1,6 +1,12 @@
 import Header from '@/components/common/Header';
 import Sidebar from '@/components/common/Sidebar';
+import type { Metadata } from 'next';
 import '../assets/styles/globals.css';
+
+export const metadata: Metadata = {
+  title: '무물봇',
+  description: '나에게 특화된 게임 챗봇',
+};
 
 export default function RootLayout({
   children,
@@ -8,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html className="h-full" lang="en">
+    <html className="h-full" lang="ko">
       <body className="flex h-full flex-col">
         <Header />
         <div className="flex flex-1 overflow-hidden">

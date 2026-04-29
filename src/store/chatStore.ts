@@ -10,6 +10,7 @@ interface ChatStore {
   chatListRefreshKey: number;
   callCount: number | null;
   callCountRefreshKey: number;
+  sessionTitles: Record<string, string>;
   setPendingMessage: (msg: string | null) => void;
   setCacheMessages: (chatId: string, messages: ChatMessage[]) => void;
   updateCacheMsg: (chatId: string, updater: (prev: ChatMessage[]) => ChatMessage[]) => void;
@@ -21,6 +22,7 @@ interface ChatStore {
   refreshChatList: () => void;
   setCallCount: (n: number) => void;
   refreshCallCount: () => void;
+  setSessionTitle: (chatId: string, title: string) => void;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -32,6 +34,7 @@ export const useChatStore = create<ChatStore>()(
     chatListRefreshKey: 0,
     callCount: null,
     callCountRefreshKey: 0,
+    sessionTitles: {},
     setPendingMessage: (msg) => set({ pendingMessage: msg }),
     setCacheMessages: (chatId, messages) =>
       set((state) => ({
@@ -52,5 +55,7 @@ export const useChatStore = create<ChatStore>()(
     setCallCount: (n) => set({ callCount: n }),
     refreshCallCount: () =>
       set((state) => ({ callCountRefreshKey: state.callCountRefreshKey + 1 })),
+    setSessionTitle: (chatId, title) =>
+      set((state) => ({ sessionTitles: { ...state.sessionTitles, [chatId]: title } })),
   })),
 );

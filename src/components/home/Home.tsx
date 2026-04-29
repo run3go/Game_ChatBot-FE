@@ -3,28 +3,56 @@
 import { getRecentNickname } from '@/lib/apis/user';
 import {
   IconAlertTriangle,
+  IconArrowsLeftRight,
   IconBuildingStore,
-  IconMessageChatbotFilled,
-  IconShieldHalf,
+  IconCards,
+  IconRefresh,
   IconUser,
+  IconUserPlus,
 } from '@tabler/icons-react';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import FeatureCard from './FeatureCard';
 
 const STATIC_CARDS = [
   {
-    icon: <IconShieldHalf size={24} color="#e11d48" />,
-    iconBgColor: 'bg-rose-100',
-    title: '레이드',
-    description: '레이드 보스 정보, 관문별 체력 등을 안내합니다',
-    examples: ['4막 2관 보스 체력을 알려줘', '1740에 갈 수 있는 적정 레이드'],
-  },
-  {
     icon: <IconBuildingStore size={24} color="#0d9488" />,
     iconBgColor: 'bg-teal-100',
     title: '경매장/거래소',
     description: '아이템 시세, 거래소 가격 정보를 조회합니다',
-    examples: ['강화 재료 시세', '10레벨 보석 가격이 얼마야?'],
+    examples: [
+      '10레벨 겁화 시세',
+      '딜러 상중 반지는 얼마야?',
+      '현재 유물 각인서 시세를 알려줘',
+    ],
+    comingSoon: false,
+  },
+  {
+    icon: <IconCards size={24} color="#6366f1" />,
+    iconBgColor: 'bg-indigo-100',
+    title: '롤토체스',
+    description: '롤토체스 정보를 조회합니다',
+    examples: [],
+    comingSoon: true,
+  },
+];
+
+const TIPS = [
+  {
+    icon: <IconUser size={15} />,
+    text: '닉네임과 함께 물어봐주시면 더 정확하게 찾아드려요!',
+  },
+  {
+    icon: <IconUserPlus size={15} />,
+    text: '처음 조회하는 캐릭터는 데이터 수집이 필요해요.',
+  },
+  {
+    icon: <IconArrowsLeftRight size={15} />,
+    text: '두 캐릭터 비교가 가능해요(예: A랑 B 스킬 비교해줘)',
+  },
+  {
+    icon: <IconRefresh size={15} />,
+    text: '최신 정보를 위해 데이터는 계속해서 갱신 중이에요.',
   },
 ];
 
@@ -50,8 +78,9 @@ export default function Home({ onSend }: HomeProps) {
       examples: [
         `${characterName}의 전투력이 어떻게 돼?`,
         `${characterName}의 정보`,
-        '요즘 처단자는 어떤 코어를 많이 써?',
+        '요즘 고기 워로드는 어떤 코어를 많이 써?',
       ],
+      comingSoon: false,
     },
     ...STATIC_CARDS,
   ];
@@ -59,14 +88,16 @@ export default function Home({ onSend }: HomeProps) {
   return (
     <div className="flex h-full w-full flex-col items-center justify-center px-8 py-12">
       <div className="flex flex-col items-center">
-        <div className="grid size-20 place-items-center rounded-2xl bg-linear-to-r from-indigo-500 to-violet-500 shadow-lg shadow-violet-200">
-          <IconMessageChatbotFilled size={50} color="white" />
-        </div>
-        <h1 className="mt-6 text-4xl font-bold text-gray-900">
-          My Game Chat Bot
-        </h1>
+        <Image
+          src="/icon.png"
+          alt="무물봇"
+          width={120}
+          height={120}
+          unoptimized
+        />
+        <h1 className="text-4xl font-bold text-gray-900">무물봇</h1>
         <span className="mt-3 text-sm text-gray-400">
-          나에게 특화된 게임 챗봇
+          구글링보다 빠른 게임 데이터 검색, 무물봇에게 한마디만 하세요!
         </span>
       </div>
 
@@ -77,11 +108,23 @@ export default function Home({ onSend }: HomeProps) {
         />
         <p>
           현재 베타 운영 중으로, 답변 가능한 질문이 제한되어 있어요. 아래 예시를
-          참고해 질문해 주시면 더 정확한 답변을 받을 수 있어요.
+          참고해 주세요.
         </p>
       </div>
 
-      <div className="mt-10 w-full max-w-3xl">
+      <div className="mt-3 grid w-full max-w-3xl grid-cols-2">
+        {TIPS.map((tip, i) => (
+          <div
+            key={i}
+            className="flex items-start gap-3 rounded-lg bg-gray-50 px-2 py-3 text-sm text-gray-600"
+          >
+            <span className="mt-0.5 shrink-0 text-gray-400">{tip.icon}</span>
+            {tip.text}
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-8 w-full max-w-3xl">
         <div className="mb-3 flex items-center justify-between">
           <p className="text-xs font-medium tracking-wider text-gray-400 uppercase">
             지원 카테고리
@@ -100,6 +143,7 @@ export default function Home({ onSend }: HomeProps) {
               description={card.description}
               examples={card.examples}
               onExampleClick={onSend}
+              comingSoon={card.comingSoon}
             />
           ))}
         </div>

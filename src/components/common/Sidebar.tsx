@@ -16,13 +16,14 @@ export default function Sidebar() {
   const [chatList, setChatList] = useState<ChatType[]>([]);
   const [justTitledChatId, setJustTitledChatId] = useState<string | null>(null);
 
-  const { pendingTitleUpdate, setPendingTitleUpdate, chatListRefreshKey } =
+  const { pendingTitleUpdate, setPendingTitleUpdate, chatListRefreshKey, setSessionTitle } =
     useChatStore();
 
   const fetchSessions = useCallback(async () => {
     const sessions = await getChatSessions();
     setChatList(sessions.map((s) => ({ title: s.title, chat_id: s.chat_id })));
-  }, []);
+    sessions.forEach((s) => setSessionTitle(s.chat_id, s.title));
+  }, [setSessionTitle]);
 
   const handleDelete = async (id: string) => {
     if (chatId === id) {
@@ -42,6 +43,7 @@ export default function Sidebar() {
           : c,
       ),
     );
+    setSessionTitle(pendingTitleUpdate.chatId, pendingTitleUpdate.title);
     setJustTitledChatId(pendingTitleUpdate.chatId);
     setPendingTitleUpdate(null);
   }, [pendingTitleUpdate, setPendingTitleUpdate]);

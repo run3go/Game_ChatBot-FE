@@ -39,9 +39,8 @@ export default function GemsSection({
       <div className="flex justify-between">
         {[...gems]
           .sort((a, b) => {
-            if (a.effect_type_name !== b.effect_type_name)
-              return a.effect_type_name.localeCompare(b.effect_type_name);
-            return b.level - a.level;
+            if (b.level !== a.level) return b.level - a.level;
+            return a.skill_name.localeCompare(b.skill_name, 'ko');
           })
           .map((gem) => (
             <div
@@ -63,7 +62,10 @@ export default function GemsSection({
                   {gem.skill_name}
                 </p>
                 <p className="mt-0.5 text-[12px] text-gray-400">
-                  {gem.effect_type_name}
+                  {gem.effect_type_name}{' '}
+                  <span className="font-semibold text-blue-300">
+                    {gem.effect_type_value}%
+                  </span>
                 </p>
               </div>
             </div>
