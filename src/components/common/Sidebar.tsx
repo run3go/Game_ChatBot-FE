@@ -14,15 +14,20 @@ export default function Sidebar() {
   const router = useRouter();
 
   const [chatList, setChatList] = useState<ChatType[]>([]);
+  const [loading, setLoading] = useState(true);
   const [justTitledChatId, setJustTitledChatId] = useState<string | null>(null);
 
   const { pendingTitleUpdate, setPendingTitleUpdate, chatListRefreshKey, setSessionTitle, removeCachedChat } =
     useChatStore();
 
   const fetchSessions = useCallback(async () => {
-    const sessions = await getChatSessions();
-    setChatList(sessions.map((s) => ({ title: s.title, chat_id: s.chat_id })));
-    sessions.forEach((s) => setSessionTitle(s.chat_id, s.title));
+    try {
+      const sessions = await getChatSessions();
+      setChatList(sessions.map((s) => ({ title: s.title, chat_id: s.chat_id })));
+      sessions.forEach((s) => setSessionTitle(s.chat_id, s.title));
+    } finally {
+      setLoading(false);
+    }
   }, [setSessionTitle]);
 
   const handleDelete = async (id: string) => {
@@ -86,6 +91,7 @@ export default function Sidebar() {
         <h2 className="text-grey-500 shrink-0 text-sm">채팅</h2>
         <ChatList
           list={chatList}
+          loading={loading}
           onDelete={handleDelete}
           justTitledChatId={justTitledChatId}
           onTitleAnimationEnd={() => setJustTitledChatId(null)}

@@ -9,6 +9,7 @@ import { twMerge } from 'tailwind-merge';
 
 interface ChatListProps {
   list: ChatType[];
+  loading?: boolean;
   onDelete: (chatId: string) => void;
   justTitledChatId: string | null;
   onTitleAnimationEnd: () => void;
@@ -16,12 +17,15 @@ interface ChatListProps {
 
 export default function ChatList({
   list,
+  loading = false,
   onDelete,
   justTitledChatId,
   onTitleAnimationEnd,
 }: ChatListProps) {
   const { id: currentChatId } = useParams();
   const loadingTitleChatId = useChatStore((state) => state.loadingTitleChatId);
+
+  if (loading) return null;
 
   if (list.length === 0) {
     return (
