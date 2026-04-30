@@ -51,6 +51,7 @@ export const TIER_RULES: Array<{
   },
   { stat: '아군 공격력 강화 효과', pct: true, 중: 3, 상: 5 },
   { stat: '아군 피해량 강화 효과', pct: true, 중: 4.5, 상: 7.5 },
+  { stat: '적에게 주는 피해', pct: true, 중: 1.2, 상: 2 },
   { stat: '적에게 주는 피해 증가', pct: true, 중: 1.2, 상: 2 },
   { stat: '전투 중 생명력 회복량', pct: false, 중: 25, 상: 50 },
   { stat: '최대 마나', pct: false, 중: 15, 상: 30 },
@@ -86,7 +87,13 @@ export const ACCESSORY_STAT_RANGE: Record<
 export function parseOrbParadisePower(effect: string | null): number | null {
   if (!effect) return null;
   const text = effect.trim().startsWith('{')
-    ? (() => { try { return JSON.stringify(JSON.parse(effect)); } catch { return effect; } })()
+    ? (() => {
+        try {
+          return JSON.stringify(JSON.parse(effect));
+        } catch {
+          return effect;
+        }
+      })()
     : effect;
   const match = text.match(/낙원력[^0-9]*([\d,]+)/);
   return match ? parseInt(match[1].replace(/,/g, ''), 10) : null;
@@ -107,7 +114,9 @@ export function splitEffectLines(text: string): string[] {
       const obj = JSON.parse(trimmed) as Record<string, string | number>;
       return Object.entries(obj).flatMap(([key, val]) =>
         key === 'description'
-          ? String(val).split(/\s*\|\s*/).filter(Boolean)
+          ? String(val)
+              .split(/\s*\|\s*/)
+              .filter(Boolean)
           : [`${key} +${val}`],
       );
     } catch {
