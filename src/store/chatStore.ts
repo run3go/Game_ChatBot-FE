@@ -14,6 +14,7 @@ interface ChatStore {
   setPendingMessage: (msg: string | null) => void;
   setCacheMessages: (chatId: string, messages: ChatMessage[]) => void;
   updateCacheMsg: (chatId: string, updater: (prev: ChatMessage[]) => ChatMessage[]) => void;
+  removeCachedChat: (chatId: string) => void;
   resetChat: () => void;
   setPendingTitleUpdate: (
     update: { chatId: string; title: string } | null,
@@ -47,6 +48,11 @@ export const useChatStore = create<ChatStore>()(
           [chatId]: updater(state.messageCache[chatId] ?? []),
         },
       })),
+    removeCachedChat: (chatId) =>
+      set((state) => {
+        const { [chatId]: _, ...rest } = state.messageCache;
+        return { messageCache: rest };
+      }),
     resetChat: () => set({ pendingMessage: null }),
     setPendingTitleUpdate: (update) => set({ pendingTitleUpdate: update }),
     setLoadingTitleChatId: (chatId) => set({ loadingTitleChatId: chatId }),

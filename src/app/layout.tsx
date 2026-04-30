@@ -1,3 +1,4 @@
+import ErrorBoundary from '@/components/common/ErrorBoundary';
 import Header from '@/components/common/Header';
 import Sidebar from '@/components/common/Sidebar';
 import type { Metadata } from 'next';
@@ -20,7 +21,7 @@ export default function RootLayout({
         <div className="flex flex-1 overflow-hidden">
           <Sidebar />
           <div className="flex w-full justify-center bg-gray-50">
-            {children}
+            <ErrorBoundary>{children}</ErrorBoundary>
           </div>
         </div>
       </body>

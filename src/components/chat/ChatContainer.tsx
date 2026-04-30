@@ -106,8 +106,8 @@ export default function ChatContainer() {
   const handleCancel = () => abortControllerRef.current?.abort();
 
   const handleSend = async (text?: string) => {
-    const question = text ?? inputValue;
-    if (!question.trim()) return;
+    const question = (text ?? inputValue).trim();
+    if (!question) return;
     sessionRef.current.hasSent = true;
 
     // 데이터 수집 확인 응답 처리

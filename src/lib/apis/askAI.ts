@@ -114,19 +114,24 @@ export const askAIStream = async (
         const raw = line.slice(6).trim();
         if (raw === '[DONE]') return;
 
-        const parsed = JSON.parse(raw);
+        let parsed: Record<string, unknown>;
+        try {
+          parsed = JSON.parse(raw);
+        } catch {
+          continue;
+        }
         if (parsed.type === 'text') {
-          onChunk(parsed.content);
+          onChunk(parsed.content as string);
         } else if (parsed.type === 'structured') {
-          onStructured(parsed.payload);
+          onStructured(parsed.payload as UIResult);
         } else if (parsed.type === 'confirm_collect') {
-          onConfirmCollect(parsed.nickname);
+          onConfirmCollect(parsed.nickname as string);
         } else if (parsed.type === 'status') {
-          onStatus(parsed.content);
+          onStatus(parsed.content as string);
         } else if (parsed.type === 'title') {
-          onTitle(parsed.content);
+          onTitle(parsed.content as string);
         } else if (parsed.type === 'data_updated_at') {
-          onDataUpdatedAt(parsed.value);
+          onDataUpdatedAt(parsed.value as string);
         }
       }
     }

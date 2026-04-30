@@ -4,7 +4,6 @@ import { ChatMessage } from '@/types/chat';
 import { IconMessageChatbotFilled } from '@tabler/icons-react';
 import React, { RefObject } from 'react';
 import ReactMarkdown from 'react-markdown';
-import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
 import UIContainer from './UIContainer';
 
@@ -50,7 +49,7 @@ export default React.memo(function MessagePair({
               <div className="prose prose-sm px-4 pt-1 text-gray-700">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
-                  rehypePlugins={[rehypeRaw]}
+
                 >
                   {statusText}
                 </ReactMarkdown>
@@ -62,7 +61,7 @@ export default React.memo(function MessagePair({
                   <div className="prose prose-sm px-4 pt-1 text-gray-700">
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
-                      rehypePlugins={[rehypeRaw]}
+    
                     >
                       {bot.content}
                     </ReactMarkdown>
@@ -70,20 +69,24 @@ export default React.memo(function MessagePair({
                 )}
               </>
             )}
-            {bot.data_updated_at && (
-              <div className="mt-2 flex justify-end px-4">
-                <span className="text-xs text-gray-400">
-                  {new Date(bot.data_updated_at).toLocaleString('ko-KR', {
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false,
-                  })}{' '}
-                  갱신
-                </span>
-              </div>
-            )}
+            {bot.data_updated_at && (() => {
+              const d = new Date(bot.data_updated_at);
+              if (isNaN(d.getTime())) return null;
+              return (
+                <div className="mt-2 flex justify-end px-4">
+                  <span className="text-xs text-gray-400">
+                    {d.toLocaleString('ko-KR', {
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      hour12: false,
+                    })}{' '}
+                    갱신
+                  </span>
+                </div>
+              );
+            })()}
           </div>
         </div>
       )}

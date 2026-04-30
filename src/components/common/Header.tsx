@@ -43,7 +43,7 @@ export default function Header() {
   const router = useRouter();
 
   useEffect(() => {
-    getCallCount().then(setCallCount);
+    getCallCount().then(setCallCount).catch(() => {});
   }, [callCountRefreshKey, setCallCount]);
 
   const handleClick = () => {
@@ -59,6 +59,7 @@ export default function Header() {
           alt="무물봇"
           width={60}
           height={60}
+          priority
           unoptimized
         />
         <h1 className="text-xl font-bold">무물봇</h1>

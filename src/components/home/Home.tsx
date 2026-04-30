@@ -64,7 +64,7 @@ export default function Home({ onSend }: HomeProps) {
   const [nickname, setNickname] = useState<string | null>(null);
 
   useEffect(() => {
-    getRecentNickname().then(setNickname);
+    getRecentNickname().then(setNickname).catch(() => {});
   }, []);
 
   const characterName = nickname ? `'${nickname}'` : '000';
@@ -93,6 +93,7 @@ export default function Home({ onSend }: HomeProps) {
           alt="무물봇"
           width={120}
           height={120}
+          priority
           unoptimized
         />
         <h1 className="text-4xl font-bold text-gray-900">무물봇</h1>

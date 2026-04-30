@@ -23,6 +23,15 @@ export default function ChatList({
   const { id: currentChatId } = useParams();
   const loadingTitleChatId = useChatStore((state) => state.loadingTitleChatId);
 
+  if (list.length === 0) {
+    return (
+      <div className="mt-6 flex flex-col items-center gap-2 text-center text-sm text-gray-400">
+        <span>아직 채팅 기록이 없어요.</span>
+        <span>새 채팅을 시작해 보세요!</span>
+      </div>
+    );
+  }
+
   return (
     <ul className="scrollbar-hide mt-3 flex flex-col overflow-y-scroll">
       {list.map((item) => {

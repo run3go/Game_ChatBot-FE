@@ -91,7 +91,6 @@ function getImportantOpts(row: DataRow): { key: string; value: string }[] {
 
 function GemCard({ row }: { row: DataRow }) {
   const opts = parseOptions(row.options);
-  console.log('[GemCard] row.options raw:', row.options, '→ parsed:', opts);
   const skillEntry = Object.entries(opts ?? {})[0];
   const skillName = skillEntry
     ? skillEntry[0].replace(/\s*%$/, '').trim()
@@ -225,7 +224,6 @@ export default function AuctionTable({ data }: { data: DataRow[] }) {
 
   if (!data || data.length === 0) return null;
 
-  console.log(data);
   function toggleSort(key: SortKey) {
     if (sortKey === key) {
       setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));

@@ -43,7 +43,6 @@ interface Props {
 const TRIPOD_COLORS = ['bg-teal-400', 'bg-indigo-400', 'bg-violet-400'];
 
 export default function SkillRow({ skill, gems = [] }: Props) {
-  console.log(gems);
   const tripods = [
     skill.tripod_1_name,
     skill.tripod_2_name,

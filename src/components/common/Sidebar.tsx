@@ -16,7 +16,7 @@ export default function Sidebar() {
   const [chatList, setChatList] = useState<ChatType[]>([]);
   const [justTitledChatId, setJustTitledChatId] = useState<string | null>(null);
 
-  const { pendingTitleUpdate, setPendingTitleUpdate, chatListRefreshKey, setSessionTitle } =
+  const { pendingTitleUpdate, setPendingTitleUpdate, chatListRefreshKey, setSessionTitle, removeCachedChat } =
     useChatStore();
 
   const fetchSessions = useCallback(async () => {
@@ -30,6 +30,7 @@ export default function Sidebar() {
       router.push('/');
     }
     setChatList((prev) => prev.filter((c) => c.chat_id !== id));
+    removeCachedChat(id);
     await deleteChatSession(id).catch(() => {});
   };
 

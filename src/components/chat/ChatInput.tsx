@@ -48,6 +48,7 @@ export default function ChatInput({
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={isLoading}
+          maxLength={1000}
           placeholder="챗봇에게 물어보기"
           className={twMerge(
             'flex-1 resize-none bg-transparent text-sm outline-none transition-colors',
