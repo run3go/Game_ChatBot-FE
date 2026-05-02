@@ -29,11 +29,11 @@ export default function ArkGrid({ data }: { data: ArkGridData }) {
   return (
     <div className="flex flex-col">
       {/* 효과 요약 */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3">
         {effects.map((effect) => (
           <div
             key={effect.name}
-            className="flex items-center justify-between rounded-xl border border-gray-100 bg-white px-4 py-3 shadow-sm"
+            className="flex items-center justify-between rounded-xl border border-gray-100 bg-white px-2 py-2 shadow-sm sm:px-4 sm:py-3"
           >
             <p className="text-sm text-gray-700">
               <span className="mr-1 font-semibold">{effect.name}</span>

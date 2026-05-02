@@ -10,8 +10,10 @@ import {
 
 export default function EquipmentItemTooltip({
   item,
+  open,
 }: {
   item: ArmoryEquipment;
+  open: boolean;
 }) {
   const gradeStyle = GRADE_STYLE[item.grade] ?? {
     text: 'text-gray-500',
@@ -31,7 +33,7 @@ export default function EquipmentItemTooltip({
       : null;
 
   return (
-    <div className="pointer-events-none absolute bottom-full left-0 z-50 mb-1.5 hidden w-64 rounded-xl bg-gray-900 p-3 shadow-2xl group-hover:block">
+    <div className={`pointer-events-none absolute bottom-full left-0 z-50 mb-1.5 w-64 rounded-xl bg-gray-900 p-3 shadow-2xl ${open ? 'block' : 'hidden'}`}>
       <p className={`text-base font-bold ${gradeStyle.text}`}>{item.name}</p>
       <p className="mt-0.5 text-[12px] text-gray-400">
         {item.grade} {item.type}

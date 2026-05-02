@@ -32,11 +32,26 @@ function formatValue(value: unknown): string {
   if (typeof value === 'object') return JSON.stringify(value);
   if (typeof value === 'number') return value.toLocaleString('ko-KR');
   const str = String(value);
-  // ISO 날짜 문자열 포맷
   if (/^\d{4}-\d{2}-\d{2}(T.*)?$/.test(str)) {
     return str.slice(0, 10);
   }
   return str;
+}
+
+function PriceDiffCell({ value }: { value: unknown }) {
+  if (value === null || value === undefined)
+    return <span className="text-gray-400">—</span>;
+  const num = Number(value);
+  if (num === 0) return <span className="text-gray-500">0</span>;
+  const sign = num > 0 ? '+' : '';
+  const arrow = num > 0 ? '▲' : '▼';
+  const color = num > 0 ? 'text-blue-500' : 'text-red-500';
+  return (
+    <span className={color}>
+      {arrow} {sign}
+      {num.toLocaleString('ko-KR')}
+    </span>
+  );
 }
 
 function getLabel(col: string): string {
@@ -82,7 +97,11 @@ export default function DataTable({ data }: { data: DataRow[] }) {
               >
                 {columns.map((col) => (
                   <td key={col} className="px-4 py-2.5 text-gray-700">
-                    {formatValue(row[col])}
+                    {col === 'price_diff' || col === 'price_change' ? (
+                      <PriceDiffCell value={row[col]} />
+                    ) : (
+                      formatValue(row[col])
+                    )}
                   </td>
                 ))}
               </tr>

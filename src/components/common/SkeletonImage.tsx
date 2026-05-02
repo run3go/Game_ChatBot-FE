@@ -3,7 +3,11 @@
 import NextImage, { ImageProps } from 'next/image';
 import { useState } from 'react';
 
-export default function SkeletonImage({ onLoad, className, ...props }: ImageProps) {
+interface SkeletonImageProps extends ImageProps {
+  wrapperClassName?: string;
+}
+
+export default function SkeletonImage({ onLoad, className, wrapperClassName, ...props }: SkeletonImageProps) {
   const [loaded, setLoaded] = useState(false);
 
   const handleLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
@@ -24,8 +28,15 @@ export default function SkeletonImage({ onLoad, className, ...props }: ImageProp
     );
   }
 
+  const wrapperStyle = wrapperClassName
+    ? undefined
+    : { width: props.width, height: props.height };
+
   return (
-    <div className="relative shrink-0" style={{ width: props.width, height: props.height }}>
+    <div
+      className={`relative shrink-0 ${wrapperClassName ?? ''}`}
+      style={wrapperStyle}
+    >
       {!loaded && <div className="absolute inset-0 animate-shimmer rounded-md" />}
       <NextImage
         {...props}

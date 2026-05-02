@@ -24,7 +24,7 @@ export default function EquipmentSection({
           <p className="mb-2 text-sm font-bold tracking-wide text-gray-400 uppercase">
             방어구
           </p>
-          <div className="flex flex-col gap-0.5">
+          <div className="grid grid-cols-2 gap-0.5 sm:grid-cols-1">
             {armor.map((item, i) => (
               <EquipmentItem key={i} item={item} />
             ))}

@@ -49,8 +49,7 @@ export default function TotalInfo({ data }: { data: TotalInfoData }) {
       {/* 탭 헤더 */}
       <div
         ref={containerRef}
-        className="relative flex gap-1 overflow-x-auto border-b border-white/10 px-1 [&::-webkit-scrollbar]:hidden"
-        style={{ scrollbarWidth: 'none' }}
+        className="relative flex justify-around border-b border-white/10"
         onMouseLeave={() => setHoveredTab(null)}
       >
         {/* 슬라이딩 인디케이터 */}
@@ -66,7 +65,7 @@ export default function TotalInfo({ data }: { data: TotalInfoData }) {
             }}
             onClick={() => setActiveTab(tab.key)}
             onMouseEnter={() => setHoveredTab(tab.key)}
-            className={`cursor-pointer px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors ${
+            className={`cursor-pointer py-2 px-1 text-sm font-medium whitespace-nowrap transition-colors ${
               activeTab === tab.key
                 ? 'text-blue-400'
                 : 'text-black-500 hover:text-blue-500'

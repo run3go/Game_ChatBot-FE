@@ -51,7 +51,7 @@ export default function UIContainer({
 }) {
   if (!result) return null;
   return (
-    <div className="pb-4 pl-4">
+    <div className="pb-4 sm:pl-4">
       {(() => {
         switch (result.ui_type) {
           case 'CONFIRM_COLLECT':

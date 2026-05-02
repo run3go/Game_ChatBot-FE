@@ -1,7 +1,7 @@
 'use client';
 
-import { ArmoryProfile } from '@/types/profile';
 import SkeletonImage from '@/components/common/SkeletonImage';
+import { ArmoryProfile } from '@/types/profile';
 
 export default function CharacterHeader({
   profile,
@@ -10,7 +10,7 @@ export default function CharacterHeader({
 }) {
   return (
     <div className="relative flex items-stretch gap-4 overflow-hidden rounded-2xl bg-white p-4 shadow-sm">
-      <div className="min-w-0 flex-1 pr-32">
+      <div className="min-w-0 flex-1 pr-24 sm:pr-32">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xl font-bold text-gray-900">
             {profile.character_name}
@@ -52,14 +52,14 @@ export default function CharacterHeader({
         </div>
       </div>
       {profile.character_image && (
-        <div className="absolute top-0 right-0 bottom-0 w-100 overflow-hidden">
+        <div className="absolute top-0 right-0 bottom-0 w-50 overflow-hidden sm:w-40 md:w-100">
           <SkeletonImage
             src={profile.character_image}
             alt={profile.character_name}
             sizes={'100'}
             fill
             quality={100}
-            className="origin-center scale-[1.2] object-cover object-top"
+            className="origin-top scale-[2.5] object-cover object-top sm:origin-center sm:scale-[1.2]"
           />
           <div className="absolute inset-0 bg-linear-to-r from-white via-white/30 to-transparent" />
         </div>

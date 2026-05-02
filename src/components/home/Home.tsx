@@ -86,33 +86,32 @@ export default function Home({ onSend }: HomeProps) {
   ];
 
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center px-8 py-12">
+    <div className="flex min-h-full w-full flex-col items-center justify-center px-4 py-8 md:px-8 md:py-12">
       <div className="flex flex-col items-center">
         <Image
           src="/icon.png"
           alt="무물봇"
           width={120}
           height={120}
+          className="size-16 md:size-30"
           unoptimized
         />
-        <h1 className="text-4xl font-bold text-gray-900">무물봇</h1>
-        <span className="mt-3 text-sm text-gray-400">
+        <h1 className="text-xl font-bold text-gray-900 md:text-4xl">무물봇</h1>
+        <span className="mt-2 text-sm text-gray-400 md:mt-3">
           구글링보다 빠른 게임 데이터 검색, 무물봇에게 한마디만 하세요!
         </span>
       </div>
 
-      <div className="mt-6 flex w-full max-w-3xl items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-        <IconAlertTriangle
-          size={16}
-          className="mt-0.5 shrink-0 text-amber-500"
-        />
+      <div className="mt-4 flex w-full max-w-3xl items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 md:mt-6">
+        <IconAlertTriangle size={16} className="mt-0.5 shrink-0 text-amber-500" />
         <p>
           현재 베타 운영 중으로, 답변 가능한 질문이 제한되어 있어요. 아래 예시를
           참고해 주세요.
         </p>
       </div>
 
-      <div className="mt-3 grid w-full max-w-3xl grid-cols-2">
+      {/* 모바일에서 숨김 — 중요도가 낮고 공간 차지 큼 */}
+      <div className="mt-3 hidden w-full max-w-3xl grid-cols-2 md:grid">
         {TIPS.map((tip, i) => (
           <div
             key={i}
@@ -124,7 +123,7 @@ export default function Home({ onSend }: HomeProps) {
         ))}
       </div>
 
-      <div className="mt-8 w-full max-w-3xl">
+      <div className="mt-4 w-full max-w-3xl md:mt-8">
         <div className="mb-3 flex items-center justify-between">
           <p className="text-xs font-medium tracking-wider text-gray-400 uppercase">
             지원 카테고리
@@ -133,7 +132,7 @@ export default function Home({ onSend }: HomeProps) {
             Beta
           </span>
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-3 md:gap-4">
           {featureCards.map((card) => (
             <FeatureCard
               key={card.title}

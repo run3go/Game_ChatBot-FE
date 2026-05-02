@@ -28,7 +28,7 @@ export default React.memo(function MessagePair({
   return (
     <div
       ref={pairRef}
-      className={`flex flex-col px-6 py-6 ${isLast ? 'min-h-full' : ''}`}
+      className={`flex flex-col px-3 py-4 sm:px-6 sm:py-6 ${isLast ? 'min-h-full' : ''}`}
     >
       <div className="flex justify-end">
         <div className="max-w-[75%] rounded-2xl bg-linear-to-r from-indigo-500 to-violet-500 px-4 py-2.5 text-sm font-medium whitespace-pre-wrap text-white shadow-sm">
@@ -37,9 +37,9 @@ export default React.memo(function MessagePair({
       </div>
 
       {bot && (
-        <div className="mt-6 flex items-start">
+        <div className={`mt-6 flex gap-2 ${streamingId === bot.id && bot.content === '' ? 'flex-row items-center' : 'flex-col sm:flex-row sm:items-start sm:gap-0'}`}>
           <div
-            className={`grid size-8 shrink-0 place-items-center rounded-xl bg-linear-to-r from-indigo-500 to-violet-500 shadow-sm ${
+            className={`grid size-8 shrink-0 place-items-center self-start rounded-xl bg-linear-to-r from-indigo-500 to-violet-500 shadow-sm ${
               streamingId === bot.id ? 'animate-pulse' : ''
             }`}
           >
@@ -47,7 +47,7 @@ export default React.memo(function MessagePair({
           </div>
           <div className="w-full pb-1.5">
             {streamingId === bot.id && bot.content === '' ? (
-              <div className="prose prose-sm px-4 pt-1 text-gray-700">
+              <div className="prose prose-sm pt-1 pl-2 text-gray-700 sm:px-4">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   rehypePlugins={[rehypeRaw]}
@@ -59,7 +59,7 @@ export default React.memo(function MessagePair({
               <>
                 <UIContainer result={bot.result} />
                 {bot.content && (
-                  <div className="prose prose-sm px-4 pt-1 text-gray-700">
+                  <div className="prose prose-sm pt-1 pl-10 text-gray-700 sm:px-4">
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
                       rehypePlugins={[rehypeRaw]}

@@ -23,15 +23,15 @@ export default function CollectibleDetail({
   return (
     <>
       {/* 헤더 */}
-      <div className="flex items-center gap-2 border-b border-gray-100 px-4 py-3">
+      <div className="flex items-center gap-2 border-b border-gray-100 px-3 py-2">
         <SkeletonImage
           src={selected.icon}
           alt={selected.type}
-          width={24}
-          height={24}
+          width={20}
+          height={20}
           className="shrink-0"
         />
-        <span className="font-bold text-gray-800">
+        <span className="text-sm font-bold text-gray-800">
           {selected.type} {selected.point}/{selected.max_point}
         </span>
         <label className="ml-auto flex cursor-pointer items-center gap-1.5 text-xs text-gray-500 hover:text-black">
@@ -48,7 +48,7 @@ export default function CollectibleDetail({
       {/* 상세 목록 */}
       <ul className="max-h-116 divide-y divide-gray-50 overflow-y-auto">
         {filteredDetails.length === 0 ? (
-          <li className="px-4 py-6 text-center text-sm text-gray-400">
+          <li className="px-3 py-5 text-center text-sm text-gray-400">
             {hideAcquired ? '미획득 항목이 없습니다.' : '세부 정보가 없습니다.'}
           </li>
         ) : (
@@ -57,7 +57,7 @@ export default function CollectibleDetail({
             return (
               <li
                 key={`${detail.point_name}-${i}`}
-                className="flex items-center px-4 py-2.5 text-sm"
+                className="flex items-center px-3 py-1.5 text-sm"
               >
                 <span className="mr-2 text-xs text-gray-400">{i + 1}.</span>
                 <span
