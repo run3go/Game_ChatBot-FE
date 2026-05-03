@@ -17,7 +17,7 @@ export default function LeftAvatar({ avatar }: { avatar: ArmoryAvatar }) {
   const gradeStyle = GRADE_STYLE[avatar.grade];
   return (
     <AvatarTooltip avatar={avatar} align="right">
-      <div className="flex items-center gap-2.5 rounded-lg px-1.5 py-1.5 transition-colors hover:bg-white/5">
+      <div className="flex items-center gap-1.5 rounded-lg px-1 py-1 transition-colors hover:bg-white/5 sm:gap-2.5 sm:px-1.5 sm:py-1.5">
         {/* 아이콘 */}
         <div className="relative shrink-0">
           <div
@@ -29,10 +29,11 @@ export default function LeftAvatar({ avatar }: { avatar: ArmoryAvatar }) {
                 alt={avatar.name}
                 width={44}
                 height={44}
-                className="size-11 rounded-md object-cover"
+                wrapperClassName="size-8 sm:size-11"
+                className="size-8 rounded-md object-cover sm:size-11"
               />
             ) : (
-              <div className="size-11 rounded-md bg-white/10" />
+              <div className="size-8 rounded-md bg-white/10 sm:size-11" />
             )}
           </div>
           {avatar.is_inner && (
@@ -48,12 +49,12 @@ export default function LeftAvatar({ avatar }: { avatar: ArmoryAvatar }) {
             {SLOT_LABEL[avatar.type] ?? avatar.type}
           </span>
           <p
-            className={`mt-1 truncate text-sm leading-tight font-semibold ${gradeStyle?.text ?? 'text-gray-300'}`}
+            className={`mt-1 truncate text-xs leading-tight font-semibold sm:text-sm ${gradeStyle?.text ?? 'text-gray-300'}`}
           >
             {avatar.name}
           </p>
           {avatar.basic_effect && (
-            <p className="mt-0.5 truncate text-xs leading-tight text-gray-500">
+            <p className="mt-0.5 hidden truncate text-xs leading-tight text-gray-500 sm:block">
               {avatar.basic_effect}
             </p>
           )}

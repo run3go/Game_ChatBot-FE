@@ -36,7 +36,7 @@ export default function GemsSection({
           </span>
         )}
       </div>
-      <div className="flex justify-between">
+      <div className="flex flex-wrap gap-2">
         {[...gems]
           .sort((a, b) => {
             if (b.level !== a.level) return b.level - a.level;

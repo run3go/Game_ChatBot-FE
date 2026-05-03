@@ -26,7 +26,7 @@ export default function ArkPassive({ data }: { data: ArkPassiveData }) {
   }
 
   return (
-    <ul className="flex">
+    <ul className="flex flex-col sm:flex-row">
       {ARK_PASSIVE_NAMES.map((name) => (
         <PassiveItem key={name} name={name} effects={effects} points={points} />
       ))}

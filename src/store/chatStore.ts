@@ -11,6 +11,7 @@ interface ChatStore {
   callCount: number | null;
   callCountRefreshKey: number;
   sessionTitles: Record<string, string>;
+  isSidebarOpen: boolean;
   setPendingMessage: (msg: string | null) => void;
   setCacheMessages: (chatId: string, messages: ChatMessage[]) => void;
   updateCacheMsg: (chatId: string, updater: (prev: ChatMessage[]) => ChatMessage[]) => void;
@@ -24,6 +25,8 @@ interface ChatStore {
   setCallCount: (n: number) => void;
   refreshCallCount: () => void;
   setSessionTitle: (chatId: string, title: string) => void;
+  setIsSidebarOpen: (open: boolean) => void;
+  toggleSidebar: () => void;
 }
 
 export const useChatStore = create<ChatStore>()(
@@ -36,6 +39,7 @@ export const useChatStore = create<ChatStore>()(
     callCount: null,
     callCountRefreshKey: 0,
     sessionTitles: {},
+    isSidebarOpen: false,
     setPendingMessage: (msg) => set({ pendingMessage: msg }),
     setCacheMessages: (chatId, messages) =>
       set((state) => ({
@@ -63,5 +67,7 @@ export const useChatStore = create<ChatStore>()(
       set((state) => ({ callCountRefreshKey: state.callCountRefreshKey + 1 })),
     setSessionTitle: (chatId, title) =>
       set((state) => ({ sessionTitles: { ...state.sessionTitles, [chatId]: title } })),
+    setIsSidebarOpen: (open) => set({ isSidebarOpen: open }),
+    toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
   })),
 );

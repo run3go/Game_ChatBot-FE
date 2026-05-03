@@ -13,9 +13,9 @@ export default function EngravingList({ data }: { data: EngravingData }) {
   if (!selected) return null;
 
   return (
-    <div className="flex gap-3">
+    <div className="flex flex-col gap-3 sm:flex-row">
       {/* 왼쪽 목록 */}
-      <div className="min-w-60 rounded-2xl bg-white p-3 shadow-sm">
+      <div className="w-full rounded-2xl bg-white p-3 shadow-sm sm:w-60 sm:shrink-0">
         <ul className="flex flex-col gap-1">
           {engravings.map((engraving) => (
             <li

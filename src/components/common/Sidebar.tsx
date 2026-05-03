@@ -3,8 +3,9 @@
 import { deleteChatSession, getChatSessions } from '@/lib/apis/user';
 import { useChatStore } from '@/store/chatStore';
 import { ChatType } from '@/types/chat';
-import { IconPlus } from '@tabler/icons-react';
-import { useParams, useRouter } from 'next/navigation';
+import { IconPlus, IconX } from '@tabler/icons-react';
+import Image from 'next/image';
+import { useParams, usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 import ChatList from '../chat/ChatList';
@@ -12,6 +13,7 @@ import ChatList from '../chat/ChatList';
 export default function Sidebar() {
   const { id: chatId } = useParams();
   const router = useRouter();
+  const pathname = usePathname();
 
   const [chatList, setChatList] = useState<ChatType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -19,6 +21,8 @@ export default function Sidebar() {
 
   const { pendingTitleUpdate, setPendingTitleUpdate, chatListRefreshKey, setSessionTitle, removeCachedChat } =
     useChatStore();
+  const isSidebarOpen = useChatStore((state) => state.isSidebarOpen);
+  const setIsSidebarOpen = useChatStore((state) => state.setIsSidebarOpen);
 
   const fetchSessions = useCallback(async () => {
     try {
@@ -38,6 +42,11 @@ export default function Sidebar() {
     removeCachedChat(id);
     await deleteChatSession(id).catch(() => {});
   };
+
+  // 모바일에서 라우트 변경 시 사이드바 닫기
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [pathname, setIsSidebarOpen]);
 
   // 세션에서 최초 질문 시, 타이틀 업데이트
   useEffect(() => {
@@ -74,8 +83,32 @@ export default function Sidebar() {
   }, [chatId, fetchSessions]);
 
   return (
-    <div className="flex h-full w-80 flex-col border-r border-gray-200">
-      <div className="h-20 border-b border-gray-200 p-4">
+    <div
+      className={twMerge(
+        'flex flex-col border-r border-gray-200 bg-white',
+        // 모바일: 전체 화면 오버레이 (top-0으로 헤더까지 덮음)
+        'fixed inset-0 z-50 w-full transition-transform duration-300',
+        // 데스크톱: 일반 레이아웃 흐름
+        'md:relative md:inset-auto md:z-auto md:h-full md:w-80 md:translate-x-0',
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full',
+      )}
+    >
+      {/* 모바일 전용 헤더 (로고 + 닫기 버튼) */}
+      <div className="flex h-16 shrink-0 items-center justify-between border-b border-gray-200 px-4 md:hidden">
+        <div className="flex items-center">
+          <Image src="/icon.png" alt="무물봇" width={40} height={40} unoptimized />
+          <span className="text-lg font-bold">무물봇</span>
+        </div>
+        <button
+          className="flex size-9 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100"
+          onClick={() => setIsSidebarOpen(false)}
+        >
+          <IconX size={22} />
+        </button>
+      </div>
+
+      {/* 새 채팅 버튼 */}
+      <div className="h-20 shrink-0 border-b border-gray-200 p-4">
         <button
           className={twMerge(
             'flex size-full cursor-pointer items-center justify-center rounded-lg bg-linear-to-r from-indigo-500 to-violet-500',
@@ -87,6 +120,7 @@ export default function Sidebar() {
           <span className="ml-3 text-white">새 채팅</span>
         </button>
       </div>
+
       <div className="flex min-h-0 flex-1 flex-col p-4">
         <h2 className="text-grey-500 shrink-0 text-sm">채팅</h2>
         <ChatList

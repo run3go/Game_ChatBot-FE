@@ -53,9 +53,9 @@ export default function AvatarList({ data }: { data: AvatarData }) {
         </div>
       )}
 
-      {/* 3단 레이아웃 */}
+      {/* 3단 오버랩 레이아웃 — 모바일/데스크탑 공통 */}
       <div className="relative grid grid-cols-[1fr_auto_1fr] overflow-hidden">
-        {/* 가운데 — 캐릭터 이미지 (절대 위치로 전체 너비에 걸쳐 배치) */}
+        {/* 가운데 — 캐릭터 이미지 */}
         {profile?.character_image && (
           <div className="pointer-events-none absolute inset-0 flex items-end justify-center">
             <div className="relative">
@@ -66,20 +66,21 @@ export default function AvatarList({ data }: { data: AvatarData }) {
                 width={300}
                 height={440}
                 quality={100}
-                className="relative h-110 w-auto object-cover drop-shadow-2xl"
+                wrapperClassName="h-80 sm:h-110"
+                className="relative h-80 w-auto drop-shadow-2xl sm:h-110"
                 style={{ imageRendering: 'crisp-edges' }}
               />
-              <div className="absolute right-0 bottom-0 left-0 z-10 h-12 bg-linear-to-t from-[#14181d] to-transparent" />
+              <div className="absolute right-0 bottom-0 left-0 z-10 h-16 bg-linear-to-t from-[#14181d] to-transparent sm:h-12" />
             </div>
           </div>
         )}
 
-        {/* 왼쪽 — 아바타 (그라디언트로 바깥은 불투명, 안쪽은 투명) */}
-        <div className="relative z-10 bg-linear-to-r from-[#14181d] via-[#14181d]/80 to-transparent py-4 pr-2 pl-4">
-          <p className="mb-3 text-xs font-semibold tracking-widest text-gray-500 uppercase">
+        {/* 왼쪽 — 아바타 */}
+        <div className="relative z-10 bg-linear-to-r from-[#14181d] via-[#14181d]/90 to-transparent py-3 pr-1 pl-3 sm:py-4 sm:pr-2 sm:pl-4">
+          <p className="mb-2 text-xs font-semibold tracking-widest text-gray-500 uppercase sm:mb-3">
             아바타
           </p>
-          <div className="space-y-1">
+          <div className="space-y-0.5 sm:space-y-1">
             {leftAvatars.map((avatar) => (
               <LeftAvatar
                 key={`${avatar.type}-${avatar.name}`}
@@ -90,14 +91,14 @@ export default function AvatarList({ data }: { data: AvatarData }) {
         </div>
 
         {/* 가운데 — 이미지 높이 유지용 스페이서 */}
-        <div className="min-h-110 min-w-32" />
+        <div className="min-h-80 min-w-12 sm:min-h-110 sm:min-w-32" />
 
-        {/* 오른쪽 — 덧입기 아바타 (그라디언트로 바깥은 불투명, 안쪽은 투명) */}
-        <div className="relative z-10 bg-linear-to-l from-[#14181d] via-[#14181d]/80 to-transparent py-4 pr-4 pl-2">
-          <p className="mb-3 text-right text-xs font-semibold tracking-widest text-gray-500 uppercase">
+        {/* 오른쪽 — 덧입기 아바타 */}
+        <div className="relative z-10 bg-linear-to-l from-[#14181d] via-[#14181d]/90 to-transparent py-3 pr-3 pl-1 sm:py-4 sm:pr-4 sm:pl-2">
+          <p className="mb-2 text-right text-xs font-semibold tracking-widest text-gray-500 uppercase sm:mb-3">
             덧입기 아바타
           </p>
-          <div className="space-y-1">
+          <div className="space-y-0.5 sm:space-y-1">
             {rightAvatars.map((avatar) => (
               <RightAvatar
                 key={`${avatar.type}-${avatar.name}`}

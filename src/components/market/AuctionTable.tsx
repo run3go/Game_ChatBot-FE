@@ -1,3 +1,5 @@
+'use client';
+
 import Pagination from '@/components/common/Pagination';
 import {
   ACCESSORY_STAT_RANGE,
@@ -7,7 +9,7 @@ import {
   type OptionTier,
 } from '@/components/profile/equipment/utils';
 import { DataRow } from '@/types/market';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type SortKey = 'quality' | 'buy_price' | 'stat_pct';
 type SortDir = 'asc' | 'desc';
@@ -221,6 +223,20 @@ export default function AuctionTable({ data }: { data: DataRow[] }) {
   const [page, setPage] = useState(0);
   const [sortKey, setSortKey] = useState<SortKey>('buy_price');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
+  const [pageSize, setPageSize] = useState(PAGE_SIZE);
+
+  useEffect(() => {
+    const update = () => {
+      const next = window.innerWidth < 640 ? 3 : PAGE_SIZE;
+      setPageSize((prev) => {
+        if (prev !== next) setPage(0);
+        return next;
+      });
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
 
   if (!data || data.length === 0) return null;
 
@@ -263,8 +279,8 @@ export default function AuctionTable({ data }: { data: DataRow[] }) {
     return sortDir === 'asc' ? av - bv : bv - av;
   });
 
-  const totalPages = Math.ceil(sorted.length / PAGE_SIZE);
-  const pageData = sorted.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  const totalPages = Math.ceil(sorted.length / pageSize);
+  const pageData = sorted.slice(page * pageSize, (page + 1) * pageSize);
 
   return (
     <div className="flex flex-col gap-4">

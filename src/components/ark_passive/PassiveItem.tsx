@@ -38,7 +38,7 @@ export default function PassiveItem({
       },
       {},
     );
-    const sortedTiers = Object.keys(tierGroups).sort();
+    const sortedTiers = Object.keys(tierGroups).sort((a, b) => Number(a) - Number(b));
 
     return (
       <div className="w-full px-4">
@@ -92,8 +92,8 @@ export default function PassiveItem({
   }
 
   return (
-    <div className="flex-1 border-r border-gray-300 px-4 last:border-r-0">
-      <div className="mb-6 flex items-center text-sm font-bold">
+    <div className="flex-1 border-b border-gray-300 px-4 py-4 last:border-b-0 sm:border-b-0 sm:border-r sm:py-0 sm:last:border-r-0">
+      <div className="mb-4 flex items-center text-sm font-bold sm:mb-6">
         <div className={`${style.background} mr-3 px-1 text-white`}>
           {filteredPoint.name}
         </div>
@@ -104,7 +104,9 @@ export default function PassiveItem({
         <span className="ml-auto text-gray-500">{filteredPoint.value}</span>
       </div>
       <ul className="flex flex-col gap-3 text-sm">
-        {filteredEffects.map((item) => (
+        {[...filteredEffects]
+          .sort((a, b) => Number(a.tier ?? 0) - Number(b.tier ?? 0))
+          .map((item) => (
           <div key={item.effect_name} className="flex items-center gap-2">
             <SkeletonImage
               alt={item.effect_name}

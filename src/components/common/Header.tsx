@@ -2,6 +2,7 @@
 
 import { getCallCount } from '@/lib/apis/user';
 import { useChatStore } from '@/store/chatStore';
+import { IconMenu2 } from '@tabler/icons-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -24,11 +25,11 @@ function CallCountBadge({ count }: { count: number | null }) {
     <div
       className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium ${style}`}
     >
-      <span>오늘 질문</span>
+      <span className="hidden sm:inline">오늘 질문</span>
       <span className="font-bold">
         {count} / {MAX_CALLS}
       </span>
-      {isLimit && <span>— 내일 초기화</span>}
+      {isLimit && <span className="hidden sm:inline">— 내일 초기화</span>}
     </div>
   );
 }
@@ -40,10 +41,13 @@ export default function Header() {
   const callCountRefreshKey = useChatStore(
     (state) => state.callCountRefreshKey,
   );
+  const toggleSidebar = useChatStore((state) => state.toggleSidebar);
   const router = useRouter();
 
   useEffect(() => {
-    getCallCount().then(setCallCount).catch(() => {});
+    getCallCount()
+      .then(setCallCount)
+      .catch(() => {});
   }, [callCountRefreshKey, setCallCount]);
 
   const handleClick = () => {
@@ -52,17 +56,26 @@ export default function Header() {
   };
 
   return (
-    <div className="flex h-16 w-full items-center justify-between border-b border-gray-200 bg-white px-6 py-3">
-      <div className="flex cursor-pointer items-center" onClick={handleClick}>
-        <Image
-          src="/icon.png"
-          alt="무물봇"
-          width={60}
-          height={60}
-          priority
-          unoptimized
-        />
-        <h1 className="text-xl font-bold">무물봇</h1>
+    <div className="relative z-40 flex h-16 w-full items-center justify-between border-b border-gray-200 bg-white px-4 py-3 md:px-6">
+      <div className="flex items-center gap-2">
+        <button
+          className="flex size-9 items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100 md:hidden"
+          onClick={toggleSidebar}
+          aria-label="메뉴"
+        >
+          <IconMenu2 size={22} />
+        </button>
+        <div className="flex cursor-pointer items-center" onClick={handleClick}>
+          <Image
+            src="/icon.png"
+            alt="무물봇"
+            width={60}
+            height={60}
+            unoptimized
+            priority
+          />
+          <h1 className="text-xl font-bold">무물봇</h1>
+        </div>
       </div>
       <CallCountBadge count={callCount} />
     </div>

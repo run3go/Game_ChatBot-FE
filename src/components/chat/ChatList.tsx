@@ -76,7 +76,7 @@ export default function ChatList({
                   e.stopPropagation();
                   onDelete(item.chat_id);
                 }}
-                className="ml-2 shrink-0 cursor-pointer rounded p-0.5 text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 hover:text-red-500"
+                className="ml-2 shrink-0 cursor-pointer rounded p-0.5 text-gray-400 transition-opacity hover:text-red-500 md:opacity-0 md:group-hover:opacity-100"
               >
                 <IconX size={14} />
               </button>

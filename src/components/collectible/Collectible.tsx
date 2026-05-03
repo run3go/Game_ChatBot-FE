@@ -1,7 +1,7 @@
 'use client';
 
-import { ArmoryCollectible, CollectibleData } from '@/types/collectible';
 import SkeletonImage from '@/components/common/SkeletonImage';
+import { ArmoryCollectible, CollectibleData } from '@/types/collectible';
 import { StaticImageData } from 'next/image';
 import { useState } from 'react';
 import CollectibleDetail from './CollectibleDetail';
@@ -45,10 +45,10 @@ export default function Collectible({ data }: { data: CollectibleData }) {
   );
 
   return (
-    <div className="flex gap-4">
+    <div className="mt-2 flex flex-col gap-4 sm:mt-0 sm:flex-row">
       {/* 좌측: 수집품 목록 */}
-      <div className="self-start">
-        <div className="grid grid-cols-2 gap-x-4 gap-y-3">
+      <div className="w-full self-start sm:w-auto">
+        <div className="grid grid-cols-6 gap-x-2 gap-y-2 sm:grid-cols-2">
           {armory_collectibles_tb.map((item) => {
             const isSelected = item.type === selected.type;
             const isComplete = item.point === item.max_point;
@@ -56,7 +56,7 @@ export default function Collectible({ data }: { data: CollectibleData }) {
               <button
                 key={item.type}
                 onClick={() => setSelected(item)}
-                className={`group relative flex cursor-pointer flex-col items-center gap-1 rounded-lg p-2 transition-all duration-150 ${
+                className={`group relative flex cursor-pointer flex-col items-center gap-0.5 rounded-lg p-1.5 transition-all duration-150 ${
                   isSelected
                     ? 'bg-indigo-50 ring-2 ring-indigo-300'
                     : 'hover:bg-gray-100 hover:shadow-sm'
@@ -71,13 +71,13 @@ export default function Collectible({ data }: { data: CollectibleData }) {
                   <SkeletonImage
                     src={ICON_IMAGE[item.type]}
                     alt={item.type}
-                    width={40}
-                    height={40}
+                    width={32}
+                    height={32}
                     className={`transition-opacity ${!isComplete ? 'opacity-60 group-hover:opacity-80' : ''}`}
                   />
                 </div>
                 <span
-                  className={`text-xs font-medium ${
+                  className={`text-[11px] font-medium ${
                     isComplete ? 'text-gray-700' : 'text-orange-500'
                   }`}
                 >
